@@ -51,38 +51,25 @@
         <ul id="todo-list">
           <transition-group>
             <li
-              class="todo-item"
+              class="todo-item card w-100"
               v-for="todo in todos"
               :key="todo.id"
               @click="showDetail(todo, $event)"
             >
-              <div class="handle-wrapper">
-                <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
-                <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
-              </div>
-              <div class="todo-info">
-                <span
-                  class="label todo-title"
-                  :class="{'is-complete':todo.completed}"
-                >{{todo.title}}</span>
-                <span
-                  class="label todo-description ml-4"
-                  v-if="todo.description"
-                >{{todo.description}}</span>
-              </div>
-              <div class="todo-priority">
-                <div class="priority-dot" :style="{background:todo.priorityColor}"></div>
-                <span>{{todo.priority }} Priority</span>
-              </div>
-
-              <!-- ACTIONS -->
-
-              <div class="actions">
-                <div></div>
-
+              <h5 class="card-header w-100" :class="{'is-complete':todo.completed}">
+                {{todo.title}}
+                <button
+                  @click.stop="deleteTodo(todo.id)"
+                  type="button"
+                  aria-label="Delete"
+                  title="Delete"
+                  class="btn-picto float-right"
+                >
+                  <i aria-hidden="true" class="material-icons">delete</i>
+                </button>
                 <button
                   type="checkbox"
-                  class="btn-picto"
+                  class="btn-picto float-right"
                   @click.stop="markComplete(todo)"
                   :title="todo.completed ? 'Undone' : 'Done'"
                 >
@@ -92,15 +79,17 @@
                     class="material-icons"
                   >{{ todo.completed ? 'check_box' : 'check_box_outline_blank' }}</i>
                 </button>
-                <button
-                  @click.stop="deleteTodo(todo.id)"
-                  type="button"
-                  aria-label="Delete"
-                  title="Delete"
-                  class="btn-picto"
-                >
-                  <i aria-hidden="true" class="material-icons">delete</i>
-                </button>
+              </h5>
+              <div class="card-body mr-auto w-100">
+                <div class="row">
+                  <div class="col-md-8">
+                    <h6 :class="{'is-complete':todo.completed}">{{todo.description}}</h6>
+                  </div>
+                  <div class="col-md-4 ml-auto todo-priority text-right">
+                    <div class="priority-dot" :style="{background:todo.priorityColor}"></div>
+                    <span>{{todo.priority }} Priority</span>
+                  </div>
+                </div>
               </div>
             </li>
           </transition-group>
@@ -139,8 +128,16 @@ export default {
 
     axios
       .get("http://127.0.0.1:8000/api/todos")
-      .then(({ data }) => {
-        this.todos = data.data;
+      .then(({ data: { data: todos } }) => {
+        this.todos = todos.map(todo => {
+          if (todo.priority) {
+            if (todo.priority === "High") todo.priorityColor = "#f5365c";
+            if (todo.priority === "Medium") todo.priorityColor = "#ffbb33";
+            if (todo.priority === "Low") todo.priorityColor = "#5e72e4";
+          }
+          return todo;
+        });
+        console.log(todos);
       })
       .catch(err => console.log(err));
   },
@@ -492,11 +489,11 @@ section.main-section {
     padding: 1.25rem;
   }
 }
-.todo-priority {
+/* .todo-priority {
   flex: 1 20%;
   display: flex;
   align-items: center;
-}
+} */
 .todo-tags {
   flex: 1 10%;
   text-align: center;
@@ -521,6 +518,7 @@ section.main-section {
   width: 20px;
 }
 .priority-dot {
+  display: inline-block;
   height: 10px;
   width: 10px;
   background: #333;
@@ -545,39 +543,5 @@ section.main-section {
   font-weight: 600;
   border-bottom: 1px solid #c5c5c5;
   margin: 0 20px;
-}
-.no-tags {
-  text-align: center;
-  font-size: 14px;
-  margin: 10px 0;
-}
-@media (max-width: 767px) {
-  #todolist li {
-    flex-wrap: wrap;
-  }
-  .todo-info {
-    flex: 1 70%;
-  }
-  .todo-priority {
-    flex: 1 25%;
-    display: flex;
-    align-items: center;
-    order: 2;
-    flex-shrink: 0;
-    flex-grow: 0;
-  }
-  .todo-tags {
-    flex: 1 10%;
-    text-align: center;
-    order: 3;
-    flex-grow: 0;
-  }
-  .todo-date {
-    flex: 1 10%;
-    align-items: center;
-  }
-  #todolist .actions {
-    flex-shrink: 0;
-  }
 }
 </style>
