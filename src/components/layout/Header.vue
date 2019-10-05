@@ -38,8 +38,10 @@ export default {
 </script>
 
 <style scoped>
+.nav-item {
+  font-size: 1.3rem;
+}
+.nav-brand {
+  font-size: 1.3rem;
+}
 </style>
-
-<router-link to="/">Home</router-link>|
-      <router-link to="/login">Login</router-link>|
-      <router-link to="/register">Register</router-link>

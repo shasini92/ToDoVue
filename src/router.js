@@ -12,7 +12,7 @@ export default new Router({
     {
       path: "/",
       name: "home",
-      component: Home
+      component: Todo
     },
     {
       path: "/login",
@@ -22,10 +22,6 @@ export default new Router({
     {
       path: "*",
       component: PageNotFound
-    },
-    {
-      path: "/todos",
-      component: Todo
     },
     {
       path: "/register",

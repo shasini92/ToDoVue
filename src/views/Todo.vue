@@ -6,7 +6,7 @@
         <div class="row">
           <div class="col-md-12 mt-3">
             <div class="card bg-gradient-secondary shadow shadow-lg--hover mt-3">
-              <form class="card-body" @submit.prevent="addnewTodo($event)">
+              <form class="card-body" @submit.prevent="addnewTodo">
                 <p class="mt-0">Create a new Todo.</p>
                 <div class="form-group">
                   <div class="input-group input-group-alternative">
@@ -15,7 +15,7 @@
                       placeholder="Todo title.."
                       name="title"
                       type="text"
-                      v-model="userInfo.email"
+                      v-model="newTodo.title"
                     />
                   </div>
                 </div>
@@ -26,14 +26,14 @@
                       class="form-control"
                       placeholder="Todo Description..."
                       name="description"
-                      type="password"
-                      v-model="userInfo.password"
+                      type="text"
+                      v-model="newTodo.description"
                     />
                   </div>
                 </div>
                 <div class="form-group">
                   <label for="priority">Set Priority</label>
-                  <select class="form-control" id="priority">
+                  <select class="form-control" id="priority" v-model="newTodo.priority">
                     <option selected>High</option>
                     <option>Medium</option>
                     <option>Low</option>
@@ -113,12 +113,13 @@ export default {
   data: function() {
     return {
       todos: [],
-      checkkAll: false,
-      newTodoText: "",
-      isFullScreen: false,
+      newTodo: {
+        title: "",
+        description: "",
+        priority: ""
+      },
       elem: document.documentElement,
       userLoggedIn: false,
-      priorityColor: null,
       userData: {},
       userInfo: ""
     };
@@ -137,7 +138,6 @@ export default {
           }
           return todo;
         });
-        console.log(todos);
       })
       .catch(err => console.log(err));
   },
@@ -165,8 +165,11 @@ export default {
 
     deleteTodo(id) {
       axios
-        .delete(`https://jsonplaceholder.typicode.com/todos/${id}`)
-        .then(res => (this.todos = this.todos.filter(todo => todo.id != id)))
+        .delete(`http://127.0.0.1:8000/api/todos/${id}`)
+        .then(res => {
+          this.todos = this.todos.filter(todo => todo.id != id);
+          console.log(res);
+        })
         .catch(err => console.log(err));
     },
     markComplete(todo) {
@@ -175,29 +178,37 @@ export default {
       ].completed;
 
       // console.log("TCL: markComplete -> todoFound", todoFound);
-    }
-    // addnewTodo(e) {
-    //   if (this.newTodoText.length > 0) {
-    //     e.preventDefault();
-    //     let newTodo = {
-    //       completed: false,
-    //       id: uuidv4(),
-    //       title: this.newTodoText,
-    //       description: null,
-    //       inDate: moment().format("MMM D"),
-    //       priority: "None",
-    //       tags: [],
-    //       priorityColor: "#11cdef"
-    //     };
-    //     this.createNewTodo(newTodo);
-    //     // this.userData.todos.push(newTodo);
+    },
+    addnewTodo() {
+      let newTodo = {
+        // TODO change user when authenticated
+        user_id: 1,
+        title: this.newTodo.title,
+        description: this.newTodo.description,
+        priority: this.newTodo.priority
+      };
 
-    //     // this.todos.unshift(newTodo);
-    //     newTodo.id++;
-    //     this.newTodoText = "";
-    //     this.updateTodos();
-    //   }
-    // },
+      const { title, description, priority, user_id } = newTodo;
+
+      axios
+        .post(`http://127.0.0.1:8000/api/todos`, {
+          title,
+          user_id,
+          priority,
+          description
+        })
+        .then(({ data: { data: todo } }) => {
+          if (todo.priority === "High") todo.priorityColor = "#f5365c";
+          if (todo.priority === "Medium") todo.priorityColor = "#ffbb33";
+          if (todo.priority === "Low") todo.priorityColor = "#5e72e4";
+          this.todos = [todo, ...this.todos];
+        })
+        .catch(err => console.log(err));
+
+      this.newTodo.title = "";
+      this.newTodo.description = "";
+      this.newTodo.priority = "";
+    }
     // checkLogin() {}
   }
 };
