@@ -184,9 +184,16 @@ export default {
         // TODO change user when authenticated
         user_id: 1,
         title: this.newTodo.title,
-        description: this.newTodo.description,
+        // TODO
+        description: () => {
+          if (this.newTodo.description === null) {
+            return "";
+          }
+        },
         priority: this.newTodo.priority
       };
+
+      console.log(newTodo.description());
 
       const { title, description, priority, user_id } = newTodo;
 

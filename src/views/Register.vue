@@ -38,6 +38,7 @@
                     />
                   </div>
                 </div>
+
                 <div>
                   <button type="submit" class="btn btn-primary btn-round btn-block btn-lg">Sign up</button>
                 </div>
@@ -70,22 +71,22 @@ export default {
   },
   methods: {
     registerForm(e) {
-      console.log("User created", this.userInfo);
-      //   axios({
-      //     method: "post",
-      //     url: "http://localhost:5000/api/register",
-      //     data: this.userInfo,
-      //     config: { headers: { "Content-Type": "application/json" } }
-      //   })
-      //     .then(function(response) {
-      //       //handle success
-      //       console.log(response);
-      //     })
-      //     .catch(function(response) {
-      //       //handle error
-      //       console.log(response);
-      //     });
-      // REDIRECT TO HOMEPAGE
+      axios({
+        method: "post",
+        url: "http://127.0.0.1:8000/register",
+        data: this.userInfo,
+        config: { headers: { "Content-Type": "application/json" } }
+      })
+        .then(function(response) {
+          //handle success
+          console.log(response);
+        })
+        .catch(function(response) {
+          //handle error
+          console.log(response);
+        });
+
+      this.$router.push("/");
     }
   }
 };
