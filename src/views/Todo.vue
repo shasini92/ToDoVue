@@ -47,52 +47,50 @@
           </div>
         </div>
 
-        <!-- TODO LIST -->
+        <!-- TODOS LIST -->
         <ul id="todo-list">
-          <transition-group>
-            <li
-              class="todo-item card w-100"
-              v-for="todo in todos"
-              :key="todo.id"
-              @click="showDetail(todo, $event)"
-            >
-              <h5 class="card-header w-100" :class="{'is-complete':todo.completed}">
-                {{todo.title}}
-                <button
-                  @click.stop="deleteTodo(todo.id)"
-                  type="button"
-                  aria-label="Delete"
-                  title="Delete"
-                  class="btn-picto float-right"
-                >
-                  <i aria-hidden="true" class="material-icons">delete</i>
-                </button>
-                <button
-                  type="checkbox"
-                  class="btn-picto float-right"
-                  @click.stop="markComplete(todo)"
-                  :title="todo.completed ? 'Undone' : 'Done'"
-                >
-                  <input type="checkbox" @change="markComplete" class="btn-picto" />
-                  <i
-                    aria-hidden="true"
-                    class="material-icons"
-                  >{{ todo.completed ? 'check_box' : 'check_box_outline_blank' }}</i>
-                </button>
-              </h5>
-              <div class="card-body mr-auto w-100">
-                <div class="row">
-                  <div class="col-md-8">
-                    <h6 :class="{'is-complete':todo.completed}">{{todo.description}}</h6>
-                  </div>
-                  <div class="col-md-4 ml-auto todo-priority text-right">
-                    <div class="priority-dot" :style="{background:todo.priorityColor}"></div>
-                    <span>{{todo.priority }} Priority</span>
-                  </div>
+          <li
+            class="todo-item card w-100"
+            v-for="todo in todos"
+            :key="todo.id"
+            @click="showDetail(todo, $event)"
+          >
+            <h5 class="card-header w-100" :class="{'is-complete':todo.completed}">
+              {{todo.title}}
+              <button
+                @click.stop="deleteTodo(todo.id)"
+                type="button"
+                aria-label="Delete"
+                title="Delete"
+                class="btn-picto float-right"
+              >
+                <i aria-hidden="true" class="material-icons">delete</i>
+              </button>
+              <button
+                type="checkbox"
+                class="btn-picto float-right"
+                @click.stop="markComplete(todo)"
+                :title="todo.completed ? 'Undone' : 'Done'"
+              >
+                <input type="checkbox" @change="markComplete" class="btn-picto" />
+                <i
+                  aria-hidden="true"
+                  class="material-icons"
+                >{{ todo.completed ? 'check_box' : 'check_box_outline_blank' }}</i>
+              </button>
+            </h5>
+            <div class="card-body mr-auto w-100">
+              <div class="row">
+                <div class="col-md-8">
+                  <h6 :class="{'is-complete':todo.completed}">{{todo.description}}</h6>
+                </div>
+                <div class="col-md-4 ml-auto todo-priority text-right">
+                  <div class="priority-dot" :style="{background:todo.priorityColor}"></div>
+                  <span>{{todo.priority }} Priority</span>
                 </div>
               </div>
-            </li>
-          </transition-group>
+            </div>
+          </li>
         </ul>
       </main>
     </section>
@@ -120,27 +118,10 @@ export default {
       },
       elem: document.documentElement,
       userLoggedIn: false,
-      userData: {},
-      userInfo: ""
+      userAccessToken: ""
     };
   },
-  created() {
-    //  this.userLoggedIn = true;
-
-    axios
-      .get("http://127.0.0.1:8000/api/todos")
-      .then(({ data: { data: todos } }) => {
-        this.todos = todos.map(todo => {
-          if (todo.priority) {
-            if (todo.priority === "High") todo.priorityColor = "#f5365c";
-            if (todo.priority === "Medium") todo.priorityColor = "#ffbb33";
-            if (todo.priority === "Low") todo.priorityColor = "#5e72e4";
-          }
-          return todo;
-        });
-      })
-      .catch(err => console.log(err));
-  },
+  props: ["userId"],
 
   methods: {
     // showDetail(todoItem, e) {
@@ -165,50 +146,48 @@ export default {
 
     deleteTodo(id) {
       axios
-        .delete(`http://127.0.0.1:8000/api/todos/${id}`)
+        .delete(`http://127.0.0.1:8000/api/todos/${id}`, {
+          headers: { Authorization: `Bearer ${this.userAccessToken}` }
+        })
         .then(res => {
           this.todos = this.todos.filter(todo => todo.id != id);
-          console.log(res);
         })
         .catch(err => console.log(err));
     },
     markComplete(todo) {
+      // TODO implement database mark completea
       this.todos[this.todos.indexOf(todo)].completed = !this.todos[
         this.todos.indexOf(todo)
       ].completed;
-
-      // console.log("TCL: markComplete -> todoFound", todoFound);
     },
     addnewTodo() {
       let newTodo = {
-        // TODO change user when authenticated
-        user_id: 1,
+        user_id: this.userId,
         title: this.newTodo.title,
-        // TODO
-        description: () => {
-          if (this.newTodo.description === null) {
-            return "";
-          }
-        },
+        // TODO implement optional description
+        // description: () => {
+        //   if (this.newTodo.description === null) {
+        //     return "";
+        //   }
+        // },
+        description: this.newTodo.description || " ",
         priority: this.newTodo.priority
       };
 
-      console.log(newTodo.description());
+      console.log(newTodo);
 
       const { title, description, priority, user_id } = newTodo;
 
       axios
-        .post(`http://127.0.0.1:8000/api/todos`, {
-          title,
-          user_id,
-          priority,
-          description
+        .post(`http://127.0.0.1:8000/api/todos`, newTodo, {
+          headers: { Authorization: `Bearer ${this.userAccessToken}` }
         })
         .then(({ data: { data: todo } }) => {
           if (todo.priority === "High") todo.priorityColor = "#f5365c";
           if (todo.priority === "Medium") todo.priorityColor = "#ffbb33";
           if (todo.priority === "Low") todo.priorityColor = "#5e72e4";
           this.todos = [todo, ...this.todos];
+          console.log(todo);
         })
         .catch(err => console.log(err));
 
@@ -217,6 +196,34 @@ export default {
       this.newTodo.priority = "";
     }
     // checkLogin() {}
+  },
+  created() {
+    if (JSON.parse(localStorage.getItem("access_token"))) {
+      this.userAccessToken = JSON.parse(localStorage.getItem("access_token"));
+      this.userLoggedIn = true;
+    } else {
+      this.userAccessToken = false;
+      this.$router.push("/login");
+    }
+    console.log(this.userId + "user id");
+
+    if (this.userLoggedIn) {
+      axios
+        .get("http://127.0.0.1:8000/api/todos", {
+          headers: { Authorization: `Bearer ${this.userAccessToken}` }
+        })
+        .then(({ data: todos }) => {
+          this.todos = todos.map(todo => {
+            if (todo.priority) {
+              if (todo.priority === "High") todo.priorityColor = "#f5365c";
+              if (todo.priority === "Medium") todo.priorityColor = "#ffbb33";
+              if (todo.priority === "Low") todo.priorityColor = "#5e72e4";
+            }
+            return todo;
+          });
+        })
+        .catch(err => console.log(err));
+    }
   }
 };
 </script>

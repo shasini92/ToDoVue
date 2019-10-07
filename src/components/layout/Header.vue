@@ -21,10 +21,16 @@
       </ul>
       <ul class="navbar-nav ml-auto">
         <li class="nav-item">
-          <router-link class="nav-link" to="/login">Login</router-link>
+          <router-link class="nav-link" to="/login" v-if="!userLoggedIn">Login</router-link>
         </li>
         <li class="nav-item">
-          <router-link class="nav-link" to="/register">Register</router-link>
+          <span class="navbar-text" v-if="userName">Welcome, {{userName}}</span>
+        </li>
+        <li class="nav-item">
+          <a class="nav-item nav-link button" v-if="userLoggedIn" @click="logout">Logout</a>
+        </li>
+        <li class="nav-item">
+          <router-link class="nav-link" to="/register" v-if="!userLoggedIn">Register</router-link>
         </li>
       </ul>
     </div>
@@ -32,8 +38,32 @@
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
-  name: "Header"
+  name: "Header",
+  props: ["userLoggedIn", "userName"],
+  methods: {
+    logout() {
+      let access_token = JSON.parse(localStorage.getItem("access_token"));
+
+      axios
+        .post(
+          "http://127.0.0.1:8000/api/logout",
+          {},
+          {
+            headers: { Authorization: `Bearer ${access_token}` }
+          }
+        )
+        .then(({ data }) => {
+          this.$emit("logout");
+          this.$router.push("/login");
+        })
+        .catch(errors => {
+          console.log("Cannot logout", errors);
+        });
+    }
+  }
 };
 </script>
 
@@ -43,5 +73,9 @@ export default {
 }
 .nav-brand {
   font-size: 1.3rem;
+}
+
+.button:hover {
+  cursor: pointer;
 }
 </style>

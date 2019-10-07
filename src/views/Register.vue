@@ -73,20 +73,23 @@ export default {
     registerForm(e) {
       axios({
         method: "post",
-        url: "http://127.0.0.1:8000/register",
+        url: "http://127.0.0.1:8000/api/register",
         data: this.userInfo,
         config: { headers: { "Content-Type": "application/json" } }
       })
-        .then(function(response) {
+        .then(({ data }) => {
           //handle success
-          console.log(response);
+          localStorage.setItem(
+            "access_token",
+            JSON.stringify(data.access_token)
+          );
         })
         .catch(function(response) {
           //handle error
           console.log(response);
         });
 
-      this.$router.push("/");
+      // this.$router.push("/");
     }
   }
 };

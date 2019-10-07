@@ -1,10 +1,7 @@
 <template>
   <div id="app">
-    <Header />
-    <!-- <div class="container">
-      <router-view />
-    </div>-->
-    <router-view />
+    <Header :userLoggedIn="userLoggedIn" @logout="logout" :userName="userName" />
+    <router-view :userLoggedIn="userLoggedIn" :userId="userId" @login="login" />
   </div>
 </template>
 
@@ -12,6 +9,33 @@
 import Header from "./components/layout/Header";
 export default {
   name: "app",
+  data() {
+    return {
+      userLoggedIn: true,
+      userName: "",
+      userId: ""
+    };
+  },
+  created() {
+    if (JSON.parse(localStorage.getItem("access_token"))) {
+      this.userLoggedIn = true;
+    } else {
+      this.userLoggedIn = false;
+    }
+  },
+  methods: {
+    logout() {
+      console.log("Logged out.");
+      localStorage.removeItem("access_token");
+      this.userLoggedIn = false;
+    },
+    login(data) {
+      this.userLoggedIn = true;
+      this.userName = data.user.name;
+      this.userId = data.user.id;
+    }
+  },
+
   components: { Header }
 };
 </script>

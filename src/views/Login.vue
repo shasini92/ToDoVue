@@ -5,7 +5,7 @@
         <div class="row row-grid align-items-center justify-content-md-center">
           <div class="col-lg-8 order-lg-1 mt-0">
             <div class="card bg-gradient-secondary shadow shadow-lg--hover mt-5">
-              <form class="card-body p-lg-5" @submit.prevent="login($event)">
+              <form class="card-body p-lg-5" @submit.prevent="login">
                 <h4 class="mb-1">Login</h4>
                 <p class="mt-0">To access the best Todos app ever.</p>
                 <div class="form-group mt-3">
@@ -49,6 +49,7 @@
 
 <script>
 import VueRouter from "vue-router";
+import axios from "axios";
 // import todoDetailModal from "./TodoDetailModal";
 
 export default {
@@ -62,26 +63,26 @@ export default {
     };
   },
   methods: {
-    login(e) {
-      let email = e.target.elements.email.value;
-      let password = e.target.elements.password.value;
-      console.log("User logged in.", this.userInfo);
+    login() {
+      let data = {
+        email: this.userInfo.email,
+        password: this.userInfo.password
+      };
 
-      //   let login = () => {
-      //     let data = {
-      //       email: email,
-      //       password: password
-      //     };
-      //     axios
-      //       .post("/api/login", data)
-      //       .then(response => {
-      //         console.log("Logged in", response);
-      //         this.$router.push("/home");
-      //       })
-      //       .catch(errors => {
-      //         console.log("Cannots login", errors);
-      //       });
-      //   };
+      axios
+        .post("http://127.0.0.1:8000/api/login", data)
+        .then(({ data }) => {
+          localStorage.setItem(
+            "access_token",
+            JSON.stringify(data.access_token)
+          );
+          console.log(data);
+          this.$emit("login", data);
+          this.$router.push("/");
+        })
+        .catch(errors => {
+          console.log("Cannot login", errors);
+        });
     }
   }
 };
