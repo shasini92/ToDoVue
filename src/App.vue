@@ -19,6 +19,8 @@ export default {
   created() {
     if (JSON.parse(localStorage.getItem("access_token"))) {
       this.userLoggedIn = true;
+      this.userId = localStorage.getItem("userId");
+      this.userName = localStorage.getItem("userName");
     } else {
       this.userLoggedIn = false;
     }
@@ -33,6 +35,8 @@ export default {
       this.userLoggedIn = true;
       this.userName = data.user.name;
       this.userId = data.user.id;
+      localStorage.setItem("userId", data.user.id);
+      localStorage.setItem("userName", data.user.name);
     }
   },
 

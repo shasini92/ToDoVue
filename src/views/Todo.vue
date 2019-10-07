@@ -3,7 +3,7 @@
     <section class="section pb-0 main-section bg-gradient-info">
       <main class="container card shadow shadow-lg--hover mt-3" id="todolist">
         <!-- CREATE NEW TODO -->
-        <div class="row">
+        <div class="row" v-if="!showUpdate">
           <div class="col-md-12 mt-3">
             <div class="card bg-gradient-secondary shadow shadow-lg--hover mt-3">
               <form class="card-body" @submit.prevent="addnewTodo">
@@ -47,13 +47,62 @@
           </div>
         </div>
 
+        <!-- UPDATE TODO -->
+        <div class="row" v-if="showUpdate">
+          <div class="col-md-12 mt-3">
+            <div class="card bg-gradient-secondary shadow shadow-lg--hover mt-3">
+              <form class="card-body" @submit.prevent="update">
+                <p class="mt-0">Update a todo</p>
+                <div class="form-group">
+                  <div class="input-group input-group-alternative">
+                    <input
+                      class="form-control"
+                      placeholder="Update title.."
+                      name="title"
+                      type="text"
+                      v-model="updatedTodo.title"
+                    />
+                  </div>
+                </div>
+                <br />
+                <div class="form-group">
+                  <div class="input-group input-group-alternative">
+                    <input
+                      class="form-control"
+                      placeholder="Update Todo Description..."
+                      name="description"
+                      type="text"
+                      v-model="updatedTodo.description"
+                    />
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="priority">Set Priority</label>
+                  <select class="form-control" id="priority" v-model="updatedTodo.priority">
+                    <option selected>High</option>
+                    <option>Medium</option>
+                    <option>Low</option>
+                  </select>
+                </div>
+                <div>
+                  <button
+                    type="submit"
+                    class="btn btn-primary btn-round btn-block btn-lg"
+                    @click="update"
+                  >Update</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+
         <!-- TODOS LIST -->
         <ul id="todo-list">
           <li
             class="todo-item card w-100"
             v-for="todo in todos"
             :key="todo.id"
-            @click="showDetail(todo, $event)"
+            @click="showUpdateForm(todo,$event)"
           >
             <h5 class="card-header w-100" :class="{'is-complete':todo.completed}">
               {{todo.title}}
@@ -94,19 +143,14 @@
         </ul>
       </main>
     </section>
-    <!-- <TodoDetailModal /> -->
   </div>
 </template>
 
 
 <script>
-// import TodoDetailModal from "./TodoDetailModal";
 import axios from "axios";
 
 export default {
-  components: {
-    // TodoDetailModal
-  },
   name: "Todo",
   data: function() {
     return {
@@ -116,34 +160,48 @@ export default {
         description: "",
         priority: ""
       },
-      elem: document.documentElement,
+      updatedTodo: {
+        title: "",
+        description: "",
+        priority: ""
+      },
       userLoggedIn: false,
-      userAccessToken: ""
+      userAccessToken: "",
+      showUpdate: false
     };
   },
   props: ["userId"],
-
   methods: {
-    // showDetail(todoItem, e) {
-    //   console.log(
-    //     "$(e.target).hasClass('.fa-tag') ",
-    //     $(e.target).hasClass("fa-tag")
-    //   );
+    showUpdateForm(todoItem, e) {
+      this.updatedTodo.title = todoItem.title;
+      this.updatedTodo.description = todoItem.description;
+      this.updatedTodo.priority = todoItem.priority;
+      this.updatedTodo.id = todoItem.id;
+      this.showUpdate = true;
+    },
+    update() {
+      let updatedTodo = {
+        user_id: this.userId,
+        title: this.updatedTodo.title,
+        description: this.updatedTodo.description,
+        priority: this.updatedTodo.priority
+      };
 
-    //   if ($(e.target).hasClass("fa-tag")) {
-    //     console.log("clicked ", e.target);
-    //     return false;
-    //   } else {
-    //     e.preventDefault();
-    //     // e.stopPropagation();
-    //     Bus.$emit("showDetailedTaskModal", todoItem);
-    //   }
-    // },
-    // clearTodos() {
-    //   this.$store.state.todos = [];
-    //   this.updateTodos();
-    // },
-
+      axios
+        .put(
+          `http://127.0.0.1:8000/api/todos/${this.updatedTodo.id}`,
+          updatedTodo,
+          {
+            headers: { Authorization: `Bearer ${this.userAccessToken}` }
+          }
+        )
+        .then(({ data: { data: todo } }) => {
+          // console.log(res);
+          this.todos = [todo, ...this.todos];
+          this.showUpdate = false;
+        })
+        .catch(err => console.log(err));
+    },
     deleteTodo(id) {
       axios
         .delete(`http://127.0.0.1:8000/api/todos/${id}`, {
@@ -164,17 +222,9 @@ export default {
       let newTodo = {
         user_id: this.userId,
         title: this.newTodo.title,
-        // TODO implement optional description
-        // description: () => {
-        //   if (this.newTodo.description === null) {
-        //     return "";
-        //   }
-        // },
-        description: this.newTodo.description || " ",
+        description: this.newTodo.description,
         priority: this.newTodo.priority
       };
-
-      console.log(newTodo);
 
       const { title, description, priority, user_id } = newTodo;
 
@@ -195,7 +245,6 @@ export default {
       this.newTodo.description = "";
       this.newTodo.priority = "";
     }
-    // checkLogin() {}
   },
   created() {
     if (JSON.parse(localStorage.getItem("access_token"))) {
@@ -205,7 +254,6 @@ export default {
       this.userAccessToken = false;
       this.$router.push("/login");
     }
-    console.log(this.userId + "user id");
 
     if (this.userLoggedIn) {
       axios

@@ -76,7 +76,6 @@ export default {
             "access_token",
             JSON.stringify(data.access_token)
           );
-          console.log(data);
           this.$emit("login", data);
           this.$router.push("/");
         })
