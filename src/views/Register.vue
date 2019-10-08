@@ -13,9 +13,8 @@
                     <input
                       class="form-control"
                       placeholder="Your Name"
-                      @blur="validate"
-                      @keyup="validateUsername($event)"
-                      @keydown="validateUsername($event)"
+                      @keyup="validate($event)"
+                      @keydown="validate($event)"
                       type="text"
                       v-model="userInfo.name"
                     />
@@ -29,9 +28,7 @@
                       placeholder="Your Email address"
                       type="email"
                       v-model="userInfo.email"
-                      @keyup="validateEmail($event)"
-                      @blur="validateEmail($event)"
-                      @keydown="validate"
+                      @keyup="validate($event)"
                     />
                   </div>
                   <small v-if="errors.email" class="text-danger">{{errors.email}}</small>
@@ -43,9 +40,7 @@
                       placeholder="Your Password"
                       type="password"
                       v-model="userInfo.password"
-                      @keyup="validatePassword($event)"
-                      @blur="validatePassword($event)"
-                      @keydown="validate"
+                      @keyup="validate($event)"
                     />
                   </div>
                   <small v-if="errors.password" class="text-danger">{{errors.password}}</small>
@@ -81,9 +76,9 @@ export default {
         password: ""
       },
       errors: {
-        username: "",
-        email: "",
-        password: ""
+        username: "Make sure the username is not empty.",
+        email: "Make sure to enter a valid email address.",
+        password: "Password must be between 8 and 20 characters."
       },
       isDisabled: true
     };
@@ -113,8 +108,8 @@ export default {
     },
     validatePassword(element) {
       let { password } = this.userInfo;
-      if (!password || password.length < 8 || password.length > 20) {
-        this.errors.password = "Password must be 8-20 characters long.";
+      if ((password = "" || password.length < 8 || password.length > 20)) {
+        this.errors.password = "Password must be between 8 and 20 characters.";
         element.srcElement.classList.add("is-invalid");
       } else {
         this.errors.password = "";
@@ -122,12 +117,19 @@ export default {
         element.srcElement.classList.add("is-valid");
       }
     },
-    validate() {
-      if (
-        !this.errors.email &&
-        !this.errors.password &&
-        !this.errors.username
-      ) {
+    validate(element) {
+      let { type } = element.srcElement;
+
+      if (type == "text") {
+        this.validateUsername(element);
+      } else if (type == "password") {
+        this.validatePassword(element);
+      } else {
+        this.validateEmail(element);
+      }
+
+      let { email, username, password } = this.errors;
+      if (email == "" && username == "" && password == "") {
         this.isDisabled = false;
       } else {
         this.isDisabled = true;
