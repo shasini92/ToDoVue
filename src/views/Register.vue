@@ -83,13 +83,13 @@ export default {
             "access_token",
             JSON.stringify(data.access_token)
           );
+          this.$emit("register", data);
+          this.$router.push("/");
         })
         .catch(function(response) {
           //handle error
           console.log(response);
         });
-
-      // this.$router.push("/");
     }
   }
 };

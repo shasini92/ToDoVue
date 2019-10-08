@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <Header :userLoggedIn="userLoggedIn" @logout="logout" :userName="userName" />
-    <router-view :userLoggedIn="userLoggedIn" :userId="userId" @login="login" />
+    <router-view :userLoggedIn="userLoggedIn" :userId="userId" @login="login" @register="register" />
   </div>
 </template>
 
@@ -27,11 +27,20 @@ export default {
   },
   methods: {
     logout() {
+      this.userLoggedIn = false;
+      this.userName = "";
       console.log("Logged out.");
       localStorage.removeItem("access_token");
-      this.userLoggedIn = false;
+      localStorage.removeItem("userName");
     },
     login(data) {
+      this.userLoggedIn = true;
+      this.userName = data.user.name;
+      this.userId = data.user.id;
+      localStorage.setItem("userId", data.user.id);
+      localStorage.setItem("userName", data.user.name);
+    },
+    register(data) {
       this.userLoggedIn = true;
       this.userName = data.user.name;
       this.userId = data.user.id;

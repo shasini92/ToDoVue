@@ -85,11 +85,7 @@
                   </select>
                 </div>
                 <div>
-                  <button
-                    type="submit"
-                    class="btn btn-primary btn-round btn-block btn-lg"
-                    @click="update"
-                  >Update</button>
+                  <button type="submit" class="btn btn-primary btn-round btn-block btn-lg">Update</button>
                 </div>
               </form>
             </div>
@@ -149,6 +145,7 @@
 
 <script>
 import axios from "axios";
+import Vue from "vue";
 
 export default {
   name: "Todo",
@@ -195,9 +192,17 @@ export default {
             headers: { Authorization: `Bearer ${this.userAccessToken}` }
           }
         )
-        .then(({ data: { data: todo } }) => {
-          // console.log(res);
-          this.todos = [todo, ...this.todos];
+        .then(res => {
+          let {
+            data: { data: todo }
+          } = res;
+          this.todos.filter(element => {
+            if (element.id === todo.id) {
+              element.title = todo.title;
+              element.description = todo.description;
+              element.priority = todo.priority;
+            }
+          });
           this.showUpdate = false;
         })
         .catch(err => console.log(err));
@@ -213,17 +218,38 @@ export default {
         .catch(err => console.log(err));
     },
     markComplete(todo) {
-      // TODO implement database mark completea
-      this.todos[this.todos.indexOf(todo)].completed = !this.todos[
-        this.todos.indexOf(todo)
-      ].completed;
+      let updatedTodo = this.todos.filter(element => {
+        if (element.id === todo.id) {
+          element.completed = !element.completed;
+          return element;
+        }
+      })[0];
+      axios
+        .put(`http://127.0.0.1:8000/api/todos/${todo.id}`, updatedTodo, {
+          headers: { Authorization: `Bearer ${this.userAccessToken}` }
+        })
+        .then(res => {
+          let {
+            data: { data: todo }
+          } = res;
+          this.todos.filter(element => {
+            if (element.id === todo.id) {
+              element.title = todo.title;
+              element.description = todo.description;
+              element.priority = todo.priority;
+              element.completed = todo.completed;
+            }
+          });
+        })
+        .catch(err => console.log(err));
     },
     addnewTodo() {
       let newTodo = {
         user_id: this.userId,
         title: this.newTodo.title,
         description: this.newTodo.description,
-        priority: this.newTodo.priority
+        priority: this.newTodo.priority,
+        completed: false
       };
 
       const { title, description, priority, user_id } = newTodo;
