@@ -15,6 +15,7 @@
                       placeholder="Todo title.."
                       name="title"
                       type="text"
+                      @keyup="validate"
                       v-model="newTodo.title"
                     />
                   </div>
@@ -40,7 +41,11 @@
                   </select>
                 </div>
                 <div>
-                  <button type="submit" class="btn btn-primary btn-round btn-block btn-lg">Create</button>
+                  <button
+                    :disabled="isDisabled"
+                    type="submit"
+                    class="btn btn-primary btn-round btn-block btn-lg"
+                  >Create</button>
                 </div>
               </form>
             </div>
@@ -60,6 +65,7 @@
                       placeholder="Update title.."
                       name="title"
                       type="text"
+                      @keyup="validate"
                       v-model="updatedTodo.title"
                     />
                   </div>
@@ -85,7 +91,11 @@
                   </select>
                 </div>
                 <div>
-                  <button type="submit" class="btn btn-info btn-round btn-block btn-lg">Update</button>
+                  <button
+                    :disabled="isDisabled"
+                    type="submit"
+                    class="btn btn-info btn-round btn-block btn-lg"
+                  >Update</button>
                 </div>
 
                 <br />
@@ -94,6 +104,7 @@
                     type="submit"
                     class="btn btn-primary btn-round btn-block btn-lg"
                     @click.prevent="addnewTodo"
+                    :disabled="isDisabled"
                   >Create</button>
                 </div>
               </form>
@@ -173,7 +184,9 @@ export default {
       },
       userLoggedIn: false,
       userAccessToken: "",
-      showUpdate: false
+      showUpdate: false,
+      titleError: "Title is required.",
+      isDisabled: true
     };
   },
   methods: {
@@ -182,7 +195,15 @@ export default {
       this.updatedTodo.description = todoItem.description;
       this.updatedTodo.priority = todoItem.priority;
       this.updatedTodo.id = todoItem.id;
+      this.validate();
       this.showUpdate = true;
+    },
+    validate() {
+      if (this.newTodo.title || this.updatedTodo.title) {
+        this.isDisabled = false;
+      } else {
+        this.isDisabled = true;
+      }
     },
     update() {
       let updatedTodo = {

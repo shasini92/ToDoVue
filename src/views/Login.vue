@@ -15,6 +15,7 @@
                       placeholder="Your Email address"
                       name="email"
                       type="email"
+                      @keyup="validate"
                       v-model="userInfo.email"
                     />
                   </div>
@@ -26,12 +27,17 @@
                       placeholder="Your Password"
                       name="password"
                       type="password"
+                      @keyup="validate"
                       v-model="userInfo.password"
                     />
                   </div>
                 </div>
                 <div>
-                  <button type="submit" class="btn btn-primary btn-round btn-block btn-lg">Login</button>
+                  <button
+                    :disabled="isDisabled"
+                    type="submit"
+                    class="btn btn-primary btn-round btn-block btn-lg"
+                  >Login</button>
                 </div>
                 <router-link to="/register" class="register-link float-right mt-2">
                   <span class="nav-link-inner--text">New Registration?</span>
@@ -45,12 +51,9 @@
   </div>
 </template>
 
-
-
 <script>
 import VueRouter from "vue-router";
 import axios from "axios";
-// import todoDetailModal from "./TodoDetailModal";
 
 export default {
   name: "Login",
@@ -59,10 +62,18 @@ export default {
       userInfo: {
         email: "",
         password: ""
-      }
+      },
+      isDisabled: true
     };
   },
   methods: {
+    validate() {
+      if (this.userInfo.email && this.userInfo.password) {
+        this.isDisabled = false;
+      } else {
+        this.isDisabled = true;
+      }
+    },
     login() {
       let data = {
         email: this.userInfo.email,
