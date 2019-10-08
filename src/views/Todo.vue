@@ -85,7 +85,16 @@
                   </select>
                 </div>
                 <div>
-                  <button type="submit" class="btn btn-primary btn-round btn-block btn-lg">Update</button>
+                  <button type="submit" class="btn btn-info btn-round btn-block btn-lg">Update</button>
+                </div>
+
+                <br />
+                <div>
+                  <button
+                    type="submit"
+                    class="btn btn-primary btn-round btn-block btn-lg"
+                    @click.prevent="addnewTodo"
+                  >Create</button>
                 </div>
               </form>
             </div>
@@ -243,9 +252,9 @@ export default {
     },
     addnewTodo() {
       let newTodo = {
-        title: this.newTodo.title,
-        description: this.newTodo.description,
-        priority: this.newTodo.priority,
+        title: this.newTodo.title || this.updatedTodo.title,
+        description: this.newTodo.description || this.updatedTodo.description,
+        priority: this.newTodo.priority || this.updatedTodo.priority,
         completed: false
       };
 
@@ -258,6 +267,7 @@ export default {
           if (todo.priority === "Medium") todo.priorityColor = "#ffbb33";
           if (todo.priority === "Low") todo.priorityColor = "#5e72e4";
           this.todos = [todo, ...this.todos];
+          this.showUpdate = false;
         })
         .catch(err => console.log(err));
 
