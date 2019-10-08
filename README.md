@@ -1,4 +1,4 @@
-# todoapp
+# A ToDo app using Laravel for the backend and Vue for the front
 
 ## Project setup
 ```
@@ -15,15 +15,7 @@ npm run serve
 npm run build
 ```
 
-### Run your tests
+### Make sure to download and follow the instructions for the server part from: 
 ```
-npm run test
+https://github.com/shasini92/ToDoLaravel
 ```
-
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
