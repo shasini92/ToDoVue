@@ -112,6 +112,18 @@
           </div>
         </div>
 
+        <!-- ALERT MESSAGES -->
+        <div class="row" v-if="alertMessage">
+          <div class="col-md-12 mt-3">
+            <div class="alert alert-dismissible fade show" :class="alertClass" role="alert">
+              <strong>{{alertMessage}}</strong>
+              <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
         <!-- TODOS LIST -->
         <ul id="todo-list">
           <li
@@ -186,8 +198,19 @@ export default {
       userAccessToken: "",
       showUpdate: false,
       titleError: "Title is required.",
-      isDisabled: true
+      isDisabled: true,
+      alertMessage: "",
+      alertColor: ""
     };
+  },
+  computed: {
+    alertClass: function() {
+      return {
+        "alert-primary": this.alertColor == "primary",
+        "alert-success": this.alertColor == "success",
+        "alert-danger": this.alertColor == "danger"
+      };
+    }
   },
   methods: {
     showUpdateForm(todoItem, e) {
@@ -232,6 +255,8 @@ export default {
             }
           });
           this.showUpdate = false;
+          this.alertMessage = "Todo successfully updated.";
+          this.alertColor = "primary";
         })
         .catch(err => console.log(err));
     },
@@ -242,6 +267,8 @@ export default {
         })
         .then(res => {
           this.todos = this.todos.filter(todo => todo.id != id);
+          this.alertMessage = "Todo successfully deleted.";
+          this.alertColor = "danger";
         })
         .catch(err => console.log(err));
     },
@@ -289,6 +316,8 @@ export default {
           if (todo.priority === "Low") todo.priorityColor = "#5e72e4";
           this.todos = [todo, ...this.todos];
           this.showUpdate = false;
+          this.alertMessage = "Todo successfully created.";
+          this.alertColor = "success";
         })
         .catch(err => console.log(err));
 
