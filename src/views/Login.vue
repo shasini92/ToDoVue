@@ -72,10 +72,6 @@ export default {
       axios
         .post("http://127.0.0.1:8000/api/login", data)
         .then(({ data }) => {
-          localStorage.setItem(
-            "access_token",
-            JSON.stringify(data.access_token)
-          );
           this.$emit("login", data);
           this.$router.push("/");
         })

@@ -155,7 +155,7 @@ export default {
       newTodo: {
         title: "",
         description: "",
-        priority: ""
+        priority: "High"
       },
       updatedTodo: {
         title: "",
@@ -167,7 +167,6 @@ export default {
       showUpdate: false
     };
   },
-  props: ["userId"],
   methods: {
     showUpdateForm(todoItem, e) {
       this.updatedTodo.title = todoItem.title;
@@ -178,7 +177,6 @@ export default {
     },
     update() {
       let updatedTodo = {
-        user_id: this.userId,
         title: this.updatedTodo.title,
         description: this.updatedTodo.description,
         priority: this.updatedTodo.priority
@@ -245,14 +243,11 @@ export default {
     },
     addnewTodo() {
       let newTodo = {
-        user_id: this.userId,
         title: this.newTodo.title,
         description: this.newTodo.description,
         priority: this.newTodo.priority,
         completed: false
       };
-
-      const { title, description, priority, user_id } = newTodo;
 
       axios
         .post(`http://127.0.0.1:8000/api/todos`, newTodo, {
@@ -263,13 +258,12 @@ export default {
           if (todo.priority === "Medium") todo.priorityColor = "#ffbb33";
           if (todo.priority === "Low") todo.priorityColor = "#5e72e4";
           this.todos = [todo, ...this.todos];
-          console.log(todo);
         })
         .catch(err => console.log(err));
 
       this.newTodo.title = "";
       this.newTodo.description = "";
-      this.newTodo.priority = "";
+      this.newTodo.priority = "High";
     }
   },
   created() {

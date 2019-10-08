@@ -29,23 +29,20 @@ export default {
     logout() {
       this.userLoggedIn = false;
       this.userName = "";
-      console.log("Logged out.");
       localStorage.removeItem("access_token");
       localStorage.removeItem("userName");
     },
     login(data) {
       this.userLoggedIn = true;
       this.userName = data.user.name;
-      this.userId = data.user.id;
-      localStorage.setItem("userId", data.user.id);
       localStorage.setItem("userName", data.user.name);
+      localStorage.setItem("access_token", JSON.stringify(data.access_token));
     },
     register(data) {
       this.userLoggedIn = true;
       this.userName = data.user.name;
-      this.userId = data.user.id;
-      localStorage.setItem("userId", data.user.id);
       localStorage.setItem("userName", data.user.name);
+      localStorage.setItem("access_token", JSON.stringify(data.access_token));
     }
   },
 
