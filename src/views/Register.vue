@@ -9,6 +9,16 @@
                 <h4 class="mb-1">Register</h4>
                 <p class="mt-0">To access the best Todos app ever.</p>
                 <div class="form-group mt-3">
+                  <div
+                    class="alert alert-danger alert-dismissible fade show"
+                    role="alert"
+                    v-if="errorMessage"
+                  >
+                    <strong>{{errorMessage}}</strong>
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                  </div>
                   <div class="input-group input-group-alternative">
                     <input
                       class="form-control"
@@ -80,7 +90,8 @@ export default {
         email: "Make sure to enter a valid email address.",
         password: "Password must be between 8 and 20 characters."
       },
-      isDisabled: true
+      isDisabled: true,
+      errorMessage: ""
     };
   },
   methods: {
@@ -146,8 +157,11 @@ export default {
           this.$emit("register", data);
           this.$router.push("/");
         })
-        .catch(function(response) {
-          console.log(response);
+        .catch(({ response: { status } }) => {
+          if (status === 500) {
+            console.log(1);
+            this.errorMessage = "User with the same email already exists.";
+          }
         });
     }
   }

@@ -5,10 +5,21 @@
         <div class="row row-grid align-items-center justify-content-md-center">
           <div class="col-lg-8 order-lg-1 mt-0">
             <div class="card bg-gradient-secondary shadow shadow-lg--hover mt-5">
-              <form class="card-body p-lg-5" @submit.prevent="login">
+              <form class="card-body p-lg-5 pt-0" @submit.prevent="login">
                 <h4 class="mb-1">Login</h4>
                 <p class="mt-0">To access the best Todos app ever.</p>
+
                 <div class="form-group mt-3">
+                  <div
+                    class="alert alert-danger alert-dismissible fade show"
+                    role="alert"
+                    v-if="errorMessage"
+                  >
+                    <strong>{{errorMessage}}</strong>
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                  </div>
                   <div class="input-group input-group-alternative">
                     <input
                       class="form-control"
@@ -40,7 +51,7 @@
                   >Login</button>
                 </div>
                 <router-link to="/register" class="register-link float-right mt-2">
-                  <span class="nav-link-inner--text">New Registration?</span>
+                  <span class="nav-link-inner--text">Not a member?</span>
                 </router-link>
               </form>
             </div>
@@ -63,7 +74,8 @@ export default {
         email: "",
         password: ""
       },
-      isDisabled: true
+      isDisabled: true,
+      errorMessage: ""
     };
   },
   methods: {
@@ -86,9 +98,13 @@ export default {
           this.$emit("login", data);
           this.$router.push("/");
         })
-        .catch(errors => {
-          console.log("Cannot login", errors);
-        });
+        .catch(
+          ({
+            response: {
+              data: { error }
+            }
+          }) => (this.errorMessage = error)
+        );
     }
   }
 };
