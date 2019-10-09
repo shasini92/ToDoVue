@@ -1,12 +1,14 @@
 <template>
   <div id="app">
-    <Header :userLoggedIn="userLoggedIn" @logout="logout" :userName="userName" />
-    <router-view :userLoggedIn="userLoggedIn" :userId="userId" @login="login" @register="register" />
+    <!-- <Header :userLoggedIn="userLoggedIn" @logout="logout" :userName="userName" /> -->
+    <!-- <router-view :userLoggedIn="userLoggedIn" :userId="userId" @login="login" @register="register" /> -->
+    <Todos />
   </div>
 </template>
 
 <script>
 import Header from "./components/layout/Header";
+import Todos from "./views/Todos";
 export default {
   name: "app",
   data() {
@@ -46,9 +48,12 @@ export default {
     }
   },
 
-  components: { Header }
+  components: { Header, Todos }
 };
 </script>
+
+// TODO make sure to update the components, uncomment the components in the template, 
+
 
 <style>
 * {
