@@ -6,7 +6,7 @@
         <div class="row" v-if="!showUpdate">
           <div class="col-md-12 mt-3">
             <div class="card bg-gradient-secondary shadow shadow-lg--hover mt-3">
-              <form class="card-body" @submit.prevent="addnewTodo">
+              <form class="card-body" @submit.prevent="handleAddTodo(accessToken)">
                 <p class="mt-0">Create a new Todo.</p>
                 <div class="form-group">
                   <div class="input-group input-group-alternative">
@@ -56,7 +56,7 @@
         <div class="row" v-if="showUpdate">
           <div class="col-md-12 mt-3">
             <div class="card bg-gradient-secondary shadow shadow-lg--hover mt-3">
-              <form class="card-body" @submit.prevent="update">
+              <form class="card-body" @submit.prevent="handleUpdate(accessToken)">
                 <p class="mt-0">Update a todo</p>
                 <div class="form-group">
                   <div class="input-group input-group-alternative">
@@ -95,6 +95,7 @@
                     :disabled="isDisabled"
                     type="submit"
                     class="btn btn-info btn-round btn-block btn-lg"
+                    @click.prevent="handleUpdate(accessToken)"
                   >Update</button>
                 </div>
 
@@ -103,7 +104,7 @@
                   <button
                     type="submit"
                     class="btn btn-primary btn-round btn-block btn-lg"
-                    @click.prevent="addnewTodo"
+                    @click.prevent="handleAddTodo(accessToken)"
                     :disabled="isDisabled"
                   >Create</button>
                 </div>
@@ -135,7 +136,7 @@
             <h5 class="card-header w-100" :class="{'is-complete':todo.completed}">
               {{todo.title}}
               <button
-                @click.stop="deleteTodo(todo.id)"
+                @click.stop="handleDelete(accessToken,todo.id)"
                 type="button"
                 aria-label="Delete"
                 title="Delete"
@@ -146,10 +147,10 @@
               <button
                 type="checkbox"
                 class="btn-picto float-right"
-                @click.stop="markComplete(todo)"
+                @click.stop="handleComplete(accessToken,todo.id)"
                 :title="todo.completed ? 'Undone' : 'Done'"
               >
-                <input type="checkbox" @change="markComplete" class="btn-picto" />
+                <input type="checkbox" class="btn-picto" />
                 <i
                   aria-hidden="true"
                   class="material-icons"
@@ -202,7 +203,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(["isUserLoggedIn", "allTodos"]),
+    ...mapGetters(["userLoggedIn", "allTodos", "accessToken"]),
     alertClass: function() {
       return {
         "alert-primary": this.alertColor == "primary",
@@ -212,7 +213,30 @@ export default {
     }
   },
   methods: {
-    ...mapActions(["getAllTodos"]),
+    ...mapActions([
+      "getAllTodos",
+      "addTodo",
+      "updateTodo",
+      "deleteTodo",
+      "markComplete"
+    ]),
+    handleAddTodo(token) {
+      let newTodo = {
+        title: this.newTodo.title || this.updatedTodo.title,
+        description: this.newTodo.description || this.updatedTodo.description,
+        priority: this.newTodo.priority || this.updatedTodo.priority,
+        completed: false
+      };
+      let data = {
+        newTodo,
+        token
+      };
+      this.addTodo(data);
+      this.showUpdate = false;
+      this.alertMessage = "Todo successfully created.";
+      this.alertColor = "success";
+    },
+
     showUpdateForm(todoItem, e) {
       this.updatedTodo.title = todoItem.title;
       this.updatedTodo.description = todoItem.description;
@@ -228,75 +252,49 @@ export default {
         this.isDisabled = true;
       }
     },
-    update() {
+    handleUpdate(token) {
       let updatedTodo = {
         title: this.updatedTodo.title,
         description: this.updatedTodo.description,
-        priority: this.updatedTodo.priority
+        priority: this.updatedTodo.priority,
+        id: this.updatedTodo.id
       };
 
-      axios
-        .put(
-          `http://127.0.0.1:8000/api/todos/${this.updatedTodo.id}`,
-          updatedTodo,
-          {
-            headers: { Authorization: `Bearer ${this.userAccessToken}` }
-          }
-        )
-        .then(res => {
-          let {
-            data: { data: todo }
-          } = res;
-          this.todos.filter(element => {
-            if (element.id === todo.id) {
-              element.title = todo.title;
-              element.description = todo.description;
-              element.priority = todo.priority;
-            }
-          });
-          this.showUpdate = false;
-          this.alertMessage = "Todo successfully updated.";
-          this.alertColor = "primary";
-        })
-        .catch(err => console.log(err));
+      let data = {
+        updatedTodo,
+        token
+      };
+      this.updateTodo(data);
+
+      this.showUpdate = false;
+      this.alertMessage = "Todo successfully updated.";
+      this.alertColor = "primary";
     },
-    deleteTodo(id) {
-      axios
-        .delete(`http://127.0.0.1:8000/api/todos/${id}`, {
-          headers: { Authorization: `Bearer ${this.userAccessToken}` }
-        })
-        .then(res => {
-          this.todos = this.todos.filter(todo => todo.id != id);
-          this.alertMessage = "Todo successfully deleted.";
-          this.alertColor = "danger";
-        })
-        .catch(err => console.log(err));
+    handleDelete(accessToken, id) {
+      let data = {
+        accessToken,
+        id
+      };
+      this.deleteTodo(data);
+      this.alertMessage = "Todo successfully deleted.";
+      this.alertColor = "danger";
     },
-    markComplete(todo) {
-      let updatedTodo = this.todos.filter(element => {
-        if (element.id === todo.id) {
+    handleComplete(accessToken, id) {
+      let updatedTodo = this.allTodos.filter(element => {
+        if (element.id === id) {
           element.completed = !element.completed;
           return element;
         }
       })[0];
-      axios
-        .put(`http://127.0.0.1:8000/api/todos/${todo.id}`, updatedTodo, {
-          headers: { Authorization: `Bearer ${this.userAccessToken}` }
-        })
-        .then(res => {
-          let {
-            data: { data: todo }
-          } = res;
-          this.todos.filter(element => {
-            if (element.id === todo.id) {
-              element.title = todo.title;
-              element.description = todo.description;
-              element.priority = todo.priority;
-              element.completed = todo.completed;
-            }
-          });
-        })
-        .catch(err => console.log(err));
+
+      updatedTodo.id = id;
+
+      let data = {
+        updatedTodo,
+        accessToken
+      };
+
+      this.markComplete(data);
     },
     addnewTodo() {
       let newTodo = {
@@ -327,13 +325,13 @@ export default {
     }
   },
   created() {
-    // this.getAllTodos();
-    if (this.isUserLoggedIn) {
-      this.getAllTodos();
-      console.log("Logged in");
-    } else {
-      // this.$router.push("/login");
-    }
+    setTimeout(() => {
+      if (this.userLoggedIn) {
+        this.getAllTodos(this.accessToken);
+      } else {
+        this.$router.push("/login");
+      }
+    }, 500);
   }
 };
 </script>

@@ -21,16 +21,20 @@
       </ul>
       <ul class="navbar-nav ml-auto">
         <li class="nav-item">
-          <router-link class="nav-link" to="/login" v-if="!isUserLoggedIn">Login</router-link>
+          <router-link class="nav-link" to="/login" v-if="!userLoggedIn">Login</router-link>
         </li>
         <li class="nav-item">
-          <span class="navbar-text" v-if="getUserName">Welcome, {{getUserName}}</span>
+          <span class="navbar-text" v-if="username">Welcome, {{username}}</span>
         </li>
         <li class="nav-item">
-          <a class="nav-item nav-link button" v-if="isUserLoggedIn" @click="logout">Logout</a>
+          <a
+            class="nav-item nav-link button"
+            v-if="userLoggedIn"
+            @click="onLogout(accessToken)"
+          >Logout</a>
         </li>
         <li class="nav-item">
-          <router-link class="nav-link" to="/register" v-if="!isUserLoggedIn">Register</router-link>
+          <router-link class="nav-link" to="/register" v-if="!userLoggedIn">Register</router-link>
         </li>
       </ul>
     </div>
@@ -43,27 +47,16 @@ import { mapActions, mapGetters } from "vuex";
 
 export default {
   name: "Header",
-  computed: mapGetters(["isUserLoggedIn", "getUserName"]),
+  state: {},
+  computed: {
+    ...mapGetters(["userLoggedIn", "accessToken", "username"])
+  },
   methods: {
-    ...mapActions(["logout"])
-    // logout() {
-    //   let access_token = JSON.parse(localStorage.getItem("access_token"));
-    //   axios
-    //     .post(
-    //       "http://127.0.0.1:8000/api/logout",
-    //       {},
-    //       {
-    //         headers: { Authorization: `Bearer ${access_token}` }
-    //       }
-    //     )
-    //     .then(({ data }) => {
-    //       this.$emit("logout");
-    //       this.$router.push("/login");
-    //     })
-    //     .catch(errors => {
-    //       console.log("Cannot logout", errors);
-    //     });
-    // }
+    ...mapActions(["logout"]),
+    onLogout(accessToken) {
+      this.logout(accessToken);
+      this.$router.push("/login");
+    }
   }
 };
 </script>

@@ -1,28 +1,29 @@
-import { authService } from "../../../services/AuthService";
+import { authService } from "../../services/AuthService";
 
 const state = {
   userLoggedIn: false,
-  userName: ""
+  userName: "",
+  accessToken: null
 };
 
 const getters = {
-  isUserLoggedIn: state => state.userLoggedIn,
-  getUserName: state => state.userName
+  userLoggedIn: store => store.userLoggedIn,
+  username: store => store.userName,
+  accessToken: store => store.accessToken
 };
 
 const actions = {
   async login({ commit }, credentials) {
     try {
       const data = await authService.login(credentials);
-
       commit("setUser", data);
     } catch (error) {
       console.log(error);
     }
   },
-  async logout({ commit }) {
+  async logout({ commit }, token) {
     try {
-      await authService.logout();
+      await authService.logout(token);
       commit("logoutUser");
     } catch (error) {
       console.log(error);
@@ -38,21 +39,36 @@ const actions = {
   }
 };
 
+// const localStorageLogin = data => {
+//   localStorage.setItem("access_token", JSON.stringify(data.access_token));
+//   localStorage.setItem("userLoggedIn", JSON.stringify(true));
+//   localStorage.setItem("username", JSON.stringify(data.user.name));
+// };
+
+// const localStorageLogout = () => {
+//   localStorage.removeItem("access_token");
+//   localStorage.removeItem("username");
+//   localStorage.setItem("userLoggedIn", JSON.stringify(false));
+// };
+
 const mutations = {
   setUser: (state, data) => {
+    // localStorageLogin(data);
+    state.accessToken = data.access_token;
     state.userLoggedIn = true;
     state.userName = data.user.name;
-    localStorage.setItem("access_token", JSON.stringify(data.access_token));
   },
   logoutUser: state => {
+    // localStorageLogout();
     state.userLoggedIn = false;
     state.userName = "";
-    localStorage.removeItem("access_token");
+    state.accessToken = null;
   },
   register: (state, data) => {
+    // localStorageLogin(data);
+    state.accessToken = data.access_token;
     state.userLoggedIn = true;
     state.userName = data.user.name;
-    localStorage.setItem("access_token", JSON.stringify(data.access_token));
   }
 };
 

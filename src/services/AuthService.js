@@ -1,9 +1,4 @@
 import axios from "axios";
-let config = {
-  headers: {
-    Authorization: `Bearer ${JSON.parse(localStorage.getItem("access_token"))}`
-  }
-};
 
 class AuthService {
   async login(credentials) {
@@ -19,9 +14,17 @@ class AuthService {
     }
   }
 
-  async logout() {
+  async logout(token) {
     try {
-      await axios.post(`http://127.0.0.1:8000/api/logout`, {}, config);
+      await axios.post(
+        `http://127.0.0.1:8000/api/logout`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}}`
+          }
+        }
+      );
     } catch (error) {
       console.log(error);
     }

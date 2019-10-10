@@ -1,5 +1,5 @@
 import axios from "axios";
-import { todoService } from "../../../services/TodoService";
+import { todoService } from "../../services/TodoService";
 
 const state = {
   todos: []
@@ -10,11 +10,30 @@ const getters = {
 };
 
 const actions = {
-  async getAllTodos({ commit }) {
+  async markComplete(data) {
     try {
-      const allTodos = await todoService.fetchTodos();
-      console.log(allTodos);
+      await todoService.updateTodo(data.updatedTodo, data.accessToken);
+    } catch (error) {
+      console.log(error);
+    }
+  },
 
+  async updateTodo({ commit }, data) {
+    try {
+      const updatedTodo = await todoService.updateTodo(
+        data.updatedTodo,
+        data.token
+      );
+      console.log(updatedTodo);
+      commit("updateTodo", updatedTodo);
+    } catch (error) {
+      console.log(error);
+    }
+  },
+
+  async getAllTodos({ commit }, token) {
+    try {
+      const allTodos = await todoService.fetchTodos(token);
       commit("setTodos", allTodos);
     } catch (error) {
       console.log(error);
@@ -22,52 +41,61 @@ const actions = {
   },
   async addTodo({ commit }, data) {
     try {
-      const newTodo = await todoService.addTodo(data);
+      const newTodo = await todoService.addTodo(data.newTodo, data.token);
+
       commit("newTodo", newTodo);
     } catch (error) {
       console.log(error);
     }
   },
-  async updateTodo({ commit }, updatedTodo) {
-    const { data } = await axios.put(
-      `https://jsonplaceholder.typicode.com/todos/${updatedTodo.id}`,
-      updatedTodo
-    );
-    commit("updateTodo", data);
-  },
-  async deleteTodo({ commit }, id) {
-    await axios.delete(`https://jsonplaceholder.typicode.com/todos/${id}`);
 
-    commit("removeTodo", id);
+  async deleteTodo({ commit }, data) {
+    try {
+      await todoService.deleteTodo(data.id, data.accessToken);
+
+      commit("removeTodo", data.id);
+    } catch (error) {
+      console.log(error);
+    }
   }
 };
 
 const mutations = {
   setTodos: (state, todos) => {
-    state.todos = todos;
-    // state.todos = todos.map(todo => {
-    //   if (todo.priority === "High") todo.priorityColor = "#f5365c";
-    //   if (todo.priority === "Medium") todo.priorityColor = "#ffbb33";
-    //   if (todo.priority === "Low") todo.priorityColor = "#5e72e4";
-    //   return todo;
-    // });
+    state.todos = todos.map(todo => {
+      if (todo.priority === "High") todo.priorityColor = "#f5365c";
+      if (todo.priority === "Medium") todo.priorityColor = "#ffbb33";
+      if (todo.priority === "Low") todo.priorityColor = "#5e72e4";
+      return todo;
+    });
   },
   newTodo: (state, todo) => {
     state.todos.unshift(todo);
-    // TODO reset form and set colors
+    // TODO reset form and set colors and alert message
     // if (todo.priority === "High") todo.priorityColor = "#f5365c";
     //     if (todo.priority === "Medium") todo.priorityColor = "#ffbb33";
     //     if (todo.priority === "Low") todo.priorityColor = "#5e72e4";
-    //     this.showUpdate = false;
-    //     this.alertMessage = "Todo successfully created.";
-    //     this.alertColor = "success";
+    //
   },
+  // markComplete: (state, updatedTodo) => {
+  //   state.todos.filter(todo => {
+  //     if (todo.id === updatedTodo.id) {
+  //       todo.completed = !todo.completed;
+  //     }
+  //   });
+
+  //   // TODO reset form and set colors and alert message
+  // },
   updateTodo: (state, updatedTodo) => {
     state.todos.filter(todo => {
       if (todo.id === updatedTodo.id) {
         todo.title = updatedTodo.title;
+        todo.description = updatedTodo.description;
+        todo.priority = updatedTodo.priority;
       }
     });
+
+    // TODO reset form and set colors and alert message
   },
   removeTodo: (state, id) =>
     (state.todos = state.todos.filter(todo => todo.id !== id))

@@ -10,6 +10,7 @@
 import Header from "./components/layout/Header";
 import Todos from "./views/Todos";
 import AddTodo from "./components/AddTodo";
+
 export default {
   name: "app",
   components: { Header, Todos, AddTodo }
