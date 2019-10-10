@@ -1,9 +1,8 @@
 <template>
   <div id="app">
     <Header />
-    <AddTodo />
-    <!-- <router-view :userLoggedIn="userLoggedIn" :userId="userId" @login="login" @register="register" /> -->
-    <Todos />
+    <!-- <AddTodo /> -->
+    <router-view />
   </div>
 </template>
 
@@ -13,43 +12,6 @@ import Todos from "./views/Todos";
 import AddTodo from "./components/AddTodo";
 export default {
   name: "app",
-  data() {
-    return {
-      userLoggedIn: true,
-      userName: "",
-      userId: ""
-    };
-  },
-  created() {
-    if (JSON.parse(localStorage.getItem("access_token"))) {
-      this.userLoggedIn = true;
-      this.userId = localStorage.getItem("userId");
-      this.userName = localStorage.getItem("userName");
-    } else {
-      this.userLoggedIn = false;
-    }
-  },
-  methods: {
-    logout() {
-      this.userLoggedIn = false;
-      this.userName = "";
-      localStorage.removeItem("access_token");
-      localStorage.removeItem("userName");
-    },
-    login(data) {
-      this.userLoggedIn = true;
-      this.userName = data.user.name;
-      localStorage.setItem("userName", data.user.name);
-      localStorage.setItem("access_token", JSON.stringify(data.access_token));
-    },
-    register(data) {
-      this.userLoggedIn = true;
-      this.userName = data.user.name;
-      localStorage.setItem("userName", data.user.name);
-      localStorage.setItem("access_token", JSON.stringify(data.access_token));
-    }
-  },
-
   components: { Header, Todos, AddTodo }
 };
 </script>

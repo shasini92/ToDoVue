@@ -1,4 +1,4 @@
-import AuthService from "../../../services/AuthService";
+import { authService } from "../../../services/AuthService";
 
 const state = {
   userLoggedIn: false,
@@ -11,25 +11,26 @@ const getters = {
 };
 
 const actions = {
-  login({ commit }, credentials) {
+  async login({ commit }, credentials) {
     try {
-      const user = AuthService.login(credentials);
-      commit("setUser", user);
+      const data = await authService.login(credentials);
+
+      commit("setUser", data);
     } catch (error) {
       console.log(error);
     }
   },
-  logout({ commit }) {
+  async logout({ commit }) {
     try {
-      AuthService.logout();
+      await authService.logout();
       commit("logoutUser");
     } catch (error) {
       console.log(error);
     }
   },
-  register({ commit }, newUser) {
+  async register({ commit }, newUser) {
     try {
-      const createdUser = AuthService.register(newUser);
+      const createdUser = await authService.register(newUser);
       commit("register", createdUser);
     } catch (error) {
       console.log(error);
@@ -38,20 +39,20 @@ const actions = {
 };
 
 const mutations = {
-  setUser: (state, user) => {
+  setUser: (state, data) => {
     state.userLoggedIn = true;
-    state.userName = user.name;
-    localStorage.setItem("access_token", JSON.stringify(user.access_token));
+    state.userName = data.user.name;
+    localStorage.setItem("access_token", JSON.stringify(data.access_token));
   },
   logoutUser: state => {
     state.userLoggedIn = false;
     state.userName = "";
     localStorage.removeItem("access_token");
   },
-  register: (state, user) => {
+  register: (state, data) => {
     state.userLoggedIn = true;
-    state.userName = user.name;
-    localStorage.setItem("access_token", JSON.stringify(user.access_token));
+    state.userName = data.user.name;
+    localStorage.setItem("access_token", JSON.stringify(data.access_token));
   }
 };
 

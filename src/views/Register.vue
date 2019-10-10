@@ -5,7 +5,7 @@
         <div class="row row-grid align-items-center justify-content-md-center mt-5">
           <div class="col-lg-8 order-lg-1 mt-0">
             <div class="card bg-gradient-secondary shadow shadow-lg--hover mt-5">
-              <form class="card-body p-lg-5" @submit.prevent="register">
+              <form class="card-body p-lg-5" @submit.prevent="onRegister">
                 <h4 class="mb-1">Register</h4>
                 <p class="mt-0">To access the best Todos app ever.</p>
                 <div class="form-group mt-3">
@@ -76,6 +76,7 @@
 
 <script>
 import axios from "axios";
+import { mapActions } from "vuex";
 export default {
   name: "Register",
   data() {
@@ -95,6 +96,7 @@ export default {
     };
   },
   methods: {
+    ...mapActions(["register"]),
     validateUsername(element) {
       if (!this.userInfo.name) {
         this.errors.username = "Name is required.";
@@ -146,23 +148,10 @@ export default {
         this.isDisabled = true;
       }
     },
-    register(e) {
-      axios({
-        method: "post",
-        url: "http://127.0.0.1:8000/api/register",
-        data: this.userInfo,
-        config: { headers: { "Content-Type": "application/json" } }
-      })
-        .then(({ data }) => {
-          this.$emit("register", data);
-          this.$router.push("/");
-        })
-        .catch(({ response: { status } }) => {
-          if (status === 500) {
-            console.log(1);
-            this.errorMessage = "User with the same email already exists.";
-          }
-        });
+    onRegister(e) {
+      this.register(this.userInfo);
+      this.$router.push("/");
+      // this.errorMessage = "User with the same email already exists.";
     }
   }
 };

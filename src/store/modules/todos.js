@@ -1,16 +1,8 @@
 import axios from "axios";
+import { todoService } from "../../../services/TodoService";
 
 const state = {
-  todos: [
-    {
-      id: 1,
-      title: "Todo One"
-    },
-    {
-      id: 2,
-      title: "Todo Two "
-    }
-  ]
+  todos: []
 };
 
 const getters = {
@@ -18,21 +10,23 @@ const getters = {
 };
 
 const actions = {
-  async fetchTodos({ commit }) {
-    const { data } = await axios.get(
-      "https://jsonplaceholder.typicode.com/todos"
-    );
-    commit("setTodos", data);
+  async getAllTodos({ commit }) {
+    try {
+      const allTodos = await todoService.fetchTodos();
+      console.log(allTodos);
+
+      commit("setTodos", allTodos);
+    } catch (error) {
+      console.log(error);
+    }
   },
-  async addTodo({ commit }, title) {
-    const { data } = await axios.post(
-      "https://jsonplaceholder.typicode.com/todos",
-      {
-        title,
-        completed: false
-      }
-    );
-    commit("newTodo", data);
+  async addTodo({ commit }, data) {
+    try {
+      const newTodo = await todoService.addTodo(data);
+      commit("newTodo", newTodo);
+    } catch (error) {
+      console.log(error);
+    }
   },
   async updateTodo({ commit }, updatedTodo) {
     const { data } = await axios.put(
@@ -49,8 +43,25 @@ const actions = {
 };
 
 const mutations = {
-  setTodos: (state, todos) => (state.todos = todos),
-  newTodo: (state, todo) => state.todos.unshift(todo),
+  setTodos: (state, todos) => {
+    state.todos = todos;
+    // state.todos = todos.map(todo => {
+    //   if (todo.priority === "High") todo.priorityColor = "#f5365c";
+    //   if (todo.priority === "Medium") todo.priorityColor = "#ffbb33";
+    //   if (todo.priority === "Low") todo.priorityColor = "#5e72e4";
+    //   return todo;
+    // });
+  },
+  newTodo: (state, todo) => {
+    state.todos.unshift(todo);
+    // TODO reset form and set colors
+    // if (todo.priority === "High") todo.priorityColor = "#f5365c";
+    //     if (todo.priority === "Medium") todo.priorityColor = "#ffbb33";
+    //     if (todo.priority === "Low") todo.priorityColor = "#5e72e4";
+    //     this.showUpdate = false;
+    //     this.alertMessage = "Todo successfully created.";
+    //     this.alertColor = "success";
+  },
   updateTodo: (state, updatedTodo) => {
     state.todos.filter(todo => {
       if (todo.id === updatedTodo.id) {

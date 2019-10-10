@@ -5,7 +5,7 @@
         <div class="row row-grid align-items-center justify-content-md-center">
           <div class="col-lg-8 order-lg-1 mt-0">
             <div class="card bg-gradient-secondary shadow shadow-lg--hover mt-5">
-              <form class="card-body p-lg-5 pt-0" @submit.prevent="login">
+              <form class="card-body p-lg-5 pt-0" @submit.prevent="onLogin">
                 <h4 class="mb-1">Login</h4>
                 <p class="mt-0">To access the best Todos app ever.</p>
 
@@ -65,6 +65,7 @@
 <script>
 import VueRouter from "vue-router";
 import axios from "axios";
+import { mapActions, mapGetters } from "vuex";
 
 export default {
   name: "Login",
@@ -78,7 +79,9 @@ export default {
       errorMessage: ""
     };
   },
+  computed: mapGetters(["isUserLoggedIn"]),
   methods: {
+    ...mapActions(["login", "register"]),
     validate() {
       if (this.userInfo.email && this.userInfo.password) {
         this.isDisabled = false;
@@ -86,25 +89,15 @@ export default {
         this.isDisabled = true;
       }
     },
-    login() {
+    onLogin() {
       let credentials = {
         email: this.userInfo.email,
         password: this.userInfo.password
       };
 
-      axios
-        .post("http://127.0.0.1:8000/api/login", credentials)
-        .then(({ data }) => {
-          this.$emit("login", data);
-          this.$router.push("/");
-        })
-        .catch(
-          ({
-            response: {
-              data: { error }
-            }
-          }) => (this.errorMessage = error)
-        );
+      this.login(credentials);
+
+      this.$router.push("/");
     }
   }
 };

@@ -1,21 +1,43 @@
-import HttpBaseClient from "./HttpBaseClient";
+import axios from "axios";
+let config = {
+  headers: {
+    Authorization: `Bearer ${JSON.parse(localStorage.getItem("access_token"))}`
+  }
+};
 
-class AuthService extends HttpBaseClient {
-  login = async credentials => {
-    const { data } = await this.getApiClient().post("login", credentials);
+class AuthService {
+  async login(credentials) {
+    try {
+      const { data } = await axios.post(
+        `http://127.0.0.1:8000/api/login`,
+        credentials
+      );
 
-    return data;
-  };
-
-  async logout() {
-    await this.getApiClient().post("logout", {});
+      return data;
+    } catch (error) {
+      console.log(error);
+    }
   }
 
-  register = async newUserData => {
-    const { data } = await this.getApiClient().post("register", newUserData);
+  async logout() {
+    try {
+      await axios.post(`http://127.0.0.1:8000/api/logout`, {}, config);
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
-    return data;
-  };
+  async register(newUserData) {
+    try {
+      const { data } = await axios.post(
+        `http://127.0.0.1:8000/api/register`,
+        newUserData
+      );
+      return data;
+    } catch (error) {
+      console.log(error);
+    }
+  }
 }
 
-export default AuthService;
+export const authService = new AuthService();

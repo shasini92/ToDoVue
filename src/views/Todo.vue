@@ -128,7 +128,7 @@
         <ul id="todo-list">
           <li
             class="todo-item card w-100"
-            v-for="todo in todos"
+            v-for="todo in allTodos"
             :key="todo.id"
             @click="showUpdateForm(todo,$event)"
           >
@@ -178,12 +178,12 @@
 <script>
 import axios from "axios";
 import Vue from "vue";
+import { mapGetters, mapActions } from "vuex";
 
 export default {
   name: "Todo",
   data: function() {
     return {
-      todos: [],
       newTodo: {
         title: "",
         description: "",
@@ -194,8 +194,6 @@ export default {
         description: "",
         priority: ""
       },
-      userLoggedIn: false,
-      userAccessToken: "",
       showUpdate: false,
       titleError: "Title is required.",
       isDisabled: true,
@@ -204,6 +202,7 @@ export default {
     };
   },
   computed: {
+    ...mapGetters(["isUserLoggedIn", "allTodos"]),
     alertClass: function() {
       return {
         "alert-primary": this.alertColor == "primary",
@@ -213,6 +212,7 @@ export default {
     }
   },
   methods: {
+    ...mapActions(["getAllTodos"]),
     showUpdateForm(todoItem, e) {
       this.updatedTodo.title = todoItem.title;
       this.updatedTodo.description = todoItem.description;
@@ -327,30 +327,12 @@ export default {
     }
   },
   created() {
-    if (JSON.parse(localStorage.getItem("access_token"))) {
-      this.userAccessToken = JSON.parse(localStorage.getItem("access_token"));
-      this.userLoggedIn = true;
+    // this.getAllTodos();
+    if (this.isUserLoggedIn) {
+      this.getAllTodos();
+      console.log("Logged in");
     } else {
-      this.userAccessToken = false;
-      this.$router.push("/login");
-    }
-
-    if (this.userLoggedIn) {
-      axios
-        .get("http://127.0.0.1:8000/api/todos", {
-          headers: { Authorization: `Bearer ${this.userAccessToken}` }
-        })
-        .then(({ data: todos }) => {
-          this.todos = todos.map(todo => {
-            if (todo.priority) {
-              if (todo.priority === "High") todo.priorityColor = "#f5365c";
-              if (todo.priority === "Medium") todo.priorityColor = "#ffbb33";
-              if (todo.priority === "Low") todo.priorityColor = "#5e72e4";
-            }
-            return todo;
-          });
-        })
-        .catch(err => console.log(err));
+      // this.$router.push("/login");
     }
   }
 };

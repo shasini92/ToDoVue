@@ -17,11 +17,11 @@ import { mapGetters, mapActions } from "vuex";
 export default {
   name: "Todos",
   methods: {
-    ...mapActions(["fetchTodos", "deleteTodo", "updateTodo"])
+    ...mapActions(["getAllTodos", "deleteTodo", "updateTodo"])
   },
   computed: mapGetters(["allTodos"]),
   created() {
-    this.fetchTodos();
+    this.getAllTodos();
   }
 };
 </script>
