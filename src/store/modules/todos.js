@@ -1,8 +1,12 @@
-import axios from "axios";
 import { todoService } from "../../services/TodoService";
+import { getPriority } from "os";
 
 const state = {
-  todos: []
+  todos: [],
+  alert: {
+    message: "",
+    color: ""
+  }
 };
 
 const getters = {
@@ -60,32 +64,25 @@ const actions = {
   }
 };
 
+const getPriorityColor = item => {
+  if (item.priority === "High") item.priorityColor = "#f5365c";
+  if (item.priority === "Medium") item.priorityColor = "#ffbb33";
+  if (item.priority === "Low") item.priorityColor = "#5e72e4";
+};
+
 const mutations = {
   setTodos: (state, todos) => {
     state.todos = todos.map(todo => {
-      if (todo.priority === "High") todo.priorityColor = "#f5365c";
-      if (todo.priority === "Medium") todo.priorityColor = "#ffbb33";
-      if (todo.priority === "Low") todo.priorityColor = "#5e72e4";
+      getPriorityColor(todo);
       return todo;
     });
   },
   newTodo: (state, todo) => {
+    getPriorityColor(todo);
     state.todos.unshift(todo);
     // TODO reset form and set colors and alert message
-    // if (todo.priority === "High") todo.priorityColor = "#f5365c";
-    //     if (todo.priority === "Medium") todo.priorityColor = "#ffbb33";
-    //     if (todo.priority === "Low") todo.priorityColor = "#5e72e4";
-    //
   },
-  // markComplete: (state, updatedTodo) => {
-  //   state.todos.filter(todo => {
-  //     if (todo.id === updatedTodo.id) {
-  //       todo.completed = !todo.completed;
-  //     }
-  //   });
 
-  //   // TODO reset form and set colors and alert message
-  // },
   updateTodo: (state, updatedTodo) => {
     state.todos.filter(todo => {
       if (todo.id === updatedTodo.id) {

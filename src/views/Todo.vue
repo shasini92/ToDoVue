@@ -2,10 +2,12 @@
   <div class="main-wrapper">
     <section class="section pb-0 main-section bg-gradient-info">
       <main class="container card shadow shadow-lg--hover mt-3" id="todolist">
+        <AddTodo v-if="!showUpdate" />
+        <UpdateTodo v-if="showUpdate" />
         <!-- CREATE NEW TODO -->
-        <div class="row" v-if="!showUpdate">
+        <!-- <div class="row" v-if="!showUpdate">
           <div class="col-md-12 mt-3">
-            <div class="card bg-gradient-secondary shadow shadow-lg--hover mt-3">
+            <div class="card bg-gradient-secondary mt-3">
               <form class="card-body" @submit.prevent="handleAddTodo(accessToken)">
                 <p class="mt-0">Create a new Todo.</p>
                 <div class="form-group">
@@ -50,12 +52,12 @@
               </form>
             </div>
           </div>
-        </div>
+        </div>-->
 
         <!-- UPDATE TODO -->
-        <div class="row" v-if="showUpdate">
+        <!-- <div class="row" v-if="showUpdate">
           <div class="col-md-12 mt-3">
-            <div class="card bg-gradient-secondary shadow shadow-lg--hover mt-3">
+            <div class="card bg-gradient-secondary mt-3">
               <form class="card-body" @submit.prevent="handleUpdate(accessToken)">
                 <p class="mt-0">Update a todo</p>
                 <div class="form-group">
@@ -111,7 +113,7 @@
               </form>
             </div>
           </div>
-        </div>
+        </div>-->
 
         <!-- ALERT MESSAGES -->
         <div class="row" v-if="alertMessage">
@@ -180,6 +182,8 @@
 import axios from "axios";
 import Vue from "vue";
 import { mapGetters, mapActions } from "vuex";
+import AddTodo from "../components/AddTodo";
+import UpdateTodo from "../components/UpdateTodo";
 
 export default {
   name: "Todo",
@@ -195,8 +199,7 @@ export default {
         description: "",
         priority: ""
       },
-      showUpdate: false,
-      titleError: "Title is required.",
+      showUpdate: true,
       isDisabled: true,
       alertMessage: "",
       alertColor: ""
@@ -325,13 +328,17 @@ export default {
     }
   },
   created() {
-    setTimeout(() => {
-      if (this.userLoggedIn) {
-        this.getAllTodos(this.accessToken);
-      } else {
-        this.$router.push("/login");
-      }
-    }, 500);
+    // setTimeout(() => {
+    //   if (this.userLoggedIn) {
+    //     this.getAllTodos(this.accessToken);
+    //   } else {
+    //     this.$router.push("/login");
+    //   }
+    // }, 500);
+  },
+  components: {
+    AddTodo,
+    UpdateTodo
   }
 };
 </script>

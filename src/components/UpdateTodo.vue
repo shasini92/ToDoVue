@@ -2,17 +2,17 @@
   <div class="row">
     <div class="col-md-12 mt-3">
       <div class="card bg-gradient-secondary mt-3">
-        <form class="card-body" @submit.prevent="handleAddTodo(accessToken)">
-          <p class="mt-0">Create a new Todo.</p>
+        <form class="card-body" @submit.prevent="handleUpdate(accessToken)">
+          <p class="mt-0">Update a todo</p>
           <div class="form-group">
             <div class="input-group input-group-alternative">
               <input
                 class="form-control"
-                placeholder="Todo title.."
+                placeholder="Update title.."
                 name="title"
                 type="text"
                 @keyup="validate"
-                v-model="newTodo.title"
+                v-model="updatedTodo.title"
               />
             </div>
           </div>
@@ -21,16 +21,16 @@
             <div class="input-group input-group-alternative">
               <input
                 class="form-control"
-                placeholder="Todo Description..."
+                placeholder="Update Todo Description..."
                 name="description"
                 type="text"
-                v-model="newTodo.description"
+                v-model="updatedTodo.description"
               />
             </div>
           </div>
           <div class="form-group">
             <label for="priority">Set Priority</label>
-            <select class="form-control" id="priority" v-model="newTodo.priority">
+            <select class="form-control" id="priority" v-model="updatedTodo.priority">
               <option selected>High</option>
               <option>Medium</option>
               <option>Low</option>
@@ -40,7 +40,18 @@
             <button
               :disabled="isDisabled"
               type="submit"
+              class="btn btn-info btn-round btn-block btn-lg"
+              @click.prevent="handleUpdate(accessToken)"
+            >Update</button>
+          </div>
+
+          <br />
+          <div>
+            <button
+              type="submit"
               class="btn btn-primary btn-round btn-block btn-lg"
+              @click.prevent="handleAddTodo(accessToken)"
+              :disabled="isDisabled"
             >Create</button>
           </div>
         </form>
@@ -51,50 +62,58 @@
 
 <script>
 import { mapActions, mapGetters } from "vuex";
-
 export default {
-  name: "AddTodo",
+  name: "UpdateTodo",
   data: function() {
     return {
-      newTodo: {
+      updatedTodo: {
         title: "",
         description: "",
-        priority: "High"
+        priority: ""
       },
-      isDisabled: true
+      isDisabled: true,
+      alert: {
+        message: "",
+        color: ""
+      }
     };
   },
   computed: {
     ...mapGetters(["accessToken"])
   },
   methods: {
-    ...mapActions(["addTodo"]),
+    ...mapActions(["addTodo", "updateTodo"]),
     handleAddTodo(token) {
       let newTodo = {
-        title: this.newTodo.title,
-        description: this.newTodo.description,
-        priority: this.newTodo.priority,
-        completed: false
+        title: this.updatedTodo.title,
+        description: this.updatedTodo.description,
+        priority: this.updatedTodo.priority,
+        id: this.updatedTodo.id
       };
       let data = {
         newTodo,
         token
       };
       this.addTodo(data);
-      this.clearForm();
       this.showUpdate = false;
       this.alert = { message: "Todo successfully created.", color: "success" };
     },
-    validate() {
-      if (this.newTodo.title) {
-        this.isDisabled = false;
-      } else {
-        this.isDisabled = true;
-      }
-    },
-    clearForm() {
-      (this.newTodo.title = ""), (this.newTodo.description = "");
-      this.newTodo.priority = "High";
+    handleUpdate(token) {
+      let updatedTodo = {
+        title: this.updatedTodo.title,
+        description: this.updatedTodo.description,
+        priority: this.updatedTodo.priority,
+        id: this.updatedTodo.id
+      };
+
+      let data = {
+        updatedTodo,
+        token
+      };
+      this.updateTodo(data);
+
+      this.showUpdate = false;
+      this.alert = { message: "Todo successfully updated.", color: "primary" };
     }
   }
 };
