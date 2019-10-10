@@ -1,7 +1,7 @@
 <template>
   <div id="app">
+    <Header />
     <AddTodo />
-    <!-- <Header :userLoggedIn="userLoggedIn" @logout="logout" :userName="userName" /> -->
     <!-- <router-view :userLoggedIn="userLoggedIn" :userId="userId" @login="login" @register="register" /> -->
     <Todos />
   </div>
