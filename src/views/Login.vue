@@ -87,13 +87,13 @@ export default {
       }
     },
     login() {
-      let data = {
+      let credentials = {
         email: this.userInfo.email,
         password: this.userInfo.password
       };
 
       axios
-        .post("http://127.0.0.1:8000/api/login", data)
+        .post("http://127.0.0.1:8000/api/login", credentials)
         .then(({ data }) => {
           this.$emit("login", data);
           this.$router.push("/");

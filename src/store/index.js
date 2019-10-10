@@ -1,6 +1,7 @@
 import Vuex from "vuex";
 import Vue from "vue";
 import todos from "./modules/todos";
+import user from "./modules/user";
 
 //  Load VueX
 Vue.use(Vuex);
@@ -9,6 +10,7 @@ Vue.use(Vuex);
 export default new Vuex.Store({
   // Here we put all the modules we have and want to use the store
   modules: {
-    todos
+    todos,
+    user
   }
 });

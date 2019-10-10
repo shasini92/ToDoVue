@@ -1,5 +1,6 @@
 <template>
   <div id="app">
+    <AddTodo />
     <!-- <Header :userLoggedIn="userLoggedIn" @logout="logout" :userName="userName" /> -->
     <!-- <router-view :userLoggedIn="userLoggedIn" :userId="userId" @login="login" @register="register" /> -->
     <Todos />
@@ -9,6 +10,7 @@
 <script>
 import Header from "./components/layout/Header";
 import Todos from "./views/Todos";
+import AddTodo from "./components/AddTodo";
 export default {
   name: "app",
   data() {
@@ -48,7 +50,7 @@ export default {
     }
   },
 
-  components: { Header, Todos }
+  components: { Header, Todos, AddTodo }
 };
 </script>
 
