@@ -1,16 +1,17 @@
 import { todoService } from "../../services/TodoService";
-import { getPriority } from "os";
 
 const state = {
   todos: [],
   alert: {
     message: "",
     color: ""
-  }
+  },
+  showUpdate: false
 };
 
 const getters = {
-  allTodos: state => state.todos
+  allTodos: state => state.todos,
+  showUpdate: state => state.showUpdate
 };
 
 const actions = {
@@ -22,6 +23,13 @@ const actions = {
     }
   },
 
+  async showUpdateForm({ commit }, data) {
+    try {
+      commit("showUpdateForm", data);
+    } catch (error) {
+      console.log(error);
+    }
+  },
   async updateTodo({ commit }, data) {
     try {
       const updatedTodo = await todoService.updateTodo(
@@ -89,13 +97,15 @@ const mutations = {
         todo.title = updatedTodo.title;
         todo.description = updatedTodo.description;
         todo.priority = updatedTodo.priority;
+        getPriorityColor(todo);
       }
     });
-
-    // TODO reset form and set colors and alert message
+    state.showUpdate = false;
   },
   removeTodo: (state, id) =>
-    (state.todos = state.todos.filter(todo => todo.id !== id))
+    (state.todos = state.todos.filter(todo => todo.id !== id)),
+
+  showUpdateForm: (state, data) => (state.showUpdate = data)
 };
 
 export default {

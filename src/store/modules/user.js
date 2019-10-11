@@ -54,18 +54,21 @@ const actions = {
 const mutations = {
   setUser: (state, data) => {
     // localStorageLogin(data);
+    localStorage.setItem("access_token", JSON.stringify(data.access_token));
     state.accessToken = data.access_token;
     state.userLoggedIn = true;
     state.userName = data.user.name;
   },
   logoutUser: state => {
     // localStorageLogout();
+    localStorage.removeItem("access_token");
     state.userLoggedIn = false;
     state.userName = "";
     state.accessToken = null;
   },
   register: (state, data) => {
     // localStorageLogin(data);
+    localStorage.setItem("access_token", JSON.stringify(data.access_token));
     state.accessToken = data.access_token;
     state.userLoggedIn = true;
     state.userName = data.user.name;

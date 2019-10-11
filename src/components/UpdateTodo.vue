@@ -62,27 +62,24 @@
 
 <script>
 import { mapActions, mapGetters } from "vuex";
+
 export default {
   name: "UpdateTodo",
   data: function() {
     return {
-      updatedTodo: {
-        title: "",
-        description: "",
-        priority: ""
-      },
-      isDisabled: true,
+      isDisabled: false,
       alert: {
         message: "",
         color: ""
       }
     };
   },
+  props: ["updatedTodo"],
   computed: {
     ...mapGetters(["accessToken"])
   },
   methods: {
-    ...mapActions(["addTodo", "updateTodo"]),
+    ...mapActions(["addTodo", "updateTodo", "showUpdateForm"]),
     handleAddTodo(token) {
       let newTodo = {
         title: this.updatedTodo.title,
@@ -95,7 +92,7 @@ export default {
         token
       };
       this.addTodo(data);
-      this.showUpdate = false;
+      this.showUpdateForm(false);
       this.alert = { message: "Todo successfully created.", color: "success" };
     },
     handleUpdate(token) {
@@ -111,9 +108,15 @@ export default {
         token
       };
       this.updateTodo(data);
-
       this.showUpdate = false;
       this.alert = { message: "Todo successfully updated.", color: "primary" };
+    },
+    validate() {
+      if (this.updatedTodo.title) {
+        this.isDisabled = false;
+      } else {
+        this.isDisabled = true;
+      }
     }
   }
 };

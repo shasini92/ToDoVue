@@ -3,7 +3,7 @@
     <section class="section pb-0 main-section bg-gradient-info">
       <main class="container card shadow shadow-lg--hover mt-3" id="todolist">
         <AddTodo v-if="!showUpdate" />
-        <UpdateTodo v-if="showUpdate" />
+        <UpdateTodo v-if="showUpdate" :updatedTodo="updatedTodo" />
         <!-- CREATE NEW TODO -->
         <!-- <div class="row" v-if="!showUpdate">
           <div class="col-md-12 mt-3">
@@ -133,7 +133,7 @@
             class="todo-item card w-100"
             v-for="todo in allTodos"
             :key="todo.id"
-            @click="showUpdateForm(todo,$event)"
+            @click="handleUpdateForm(todo,$event)"
           >
             <h5 class="card-header w-100" :class="{'is-complete':todo.completed}">
               {{todo.title}}
@@ -199,14 +199,13 @@ export default {
         description: "",
         priority: ""
       },
-      showUpdate: true,
       isDisabled: true,
       alertMessage: "",
       alertColor: ""
     };
   },
   computed: {
-    ...mapGetters(["userLoggedIn", "allTodos", "accessToken"]),
+    ...mapGetters(["userLoggedIn", "allTodos", "accessToken", "showUpdate"]),
     alertClass: function() {
       return {
         "alert-primary": this.alertColor == "primary",
@@ -221,7 +220,8 @@ export default {
       "addTodo",
       "updateTodo",
       "deleteTodo",
-      "markComplete"
+      "markComplete",
+      "showUpdateForm"
     ]),
     handleAddTodo(token) {
       let newTodo = {
@@ -240,13 +240,12 @@ export default {
       this.alertColor = "success";
     },
 
-    showUpdateForm(todoItem, e) {
+    handleUpdateForm(todoItem, e) {
       this.updatedTodo.title = todoItem.title;
       this.updatedTodo.description = todoItem.description;
       this.updatedTodo.priority = todoItem.priority;
       this.updatedTodo.id = todoItem.id;
-      this.validate();
-      this.showUpdate = true;
+      this.showUpdateForm(true);
     },
     validate() {
       if (this.newTodo.title || this.updatedTodo.title) {
@@ -298,43 +297,10 @@ export default {
       };
 
       this.markComplete(data);
-    },
-    addnewTodo() {
-      let newTodo = {
-        title: this.newTodo.title || this.updatedTodo.title,
-        description: this.newTodo.description || this.updatedTodo.description,
-        priority: this.newTodo.priority || this.updatedTodo.priority,
-        completed: false
-      };
-
-      axios
-        .post(`http://127.0.0.1:8000/api/todos`, newTodo, {
-          headers: { Authorization: `Bearer ${this.userAccessToken}` }
-        })
-        .then(({ data: { data: todo } }) => {
-          if (todo.priority === "High") todo.priorityColor = "#f5365c";
-          if (todo.priority === "Medium") todo.priorityColor = "#ffbb33";
-          if (todo.priority === "Low") todo.priorityColor = "#5e72e4";
-          this.todos = [todo, ...this.todos];
-          this.showUpdate = false;
-          this.alertMessage = "Todo successfully created.";
-          this.alertColor = "success";
-        })
-        .catch(err => console.log(err));
-
-      this.newTodo.title = "";
-      this.newTodo.description = "";
-      this.newTodo.priority = "High";
     }
   },
   created() {
-    // setTimeout(() => {
-    //   if (this.userLoggedIn) {
-    //     this.getAllTodos(this.accessToken);
-    //   } else {
-    //     this.$router.push("/login");
-    //   }
-    // }, 500);
+    this.getAllTodos(JSON.parse(localStorage.getItem("access_token")));
   },
   components: {
     AddTodo,

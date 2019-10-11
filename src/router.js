@@ -6,13 +6,16 @@ import Todo from "./views/Todo";
 
 Vue.use(Router);
 
-export default new Router({
+const router = new Router({
   mode: "history",
   routes: [
     {
       path: "/",
       name: "home",
-      component: Todo
+      component: Todo,
+      meta: {
+        requiresAuth: true
+      }
     },
     {
       path: "/login",
@@ -26,11 +29,20 @@ export default new Router({
     {
       path: "/register",
       name: "Register",
-      // route level code-splitting
-      // this generates a separate chunk (about.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
       component: () =>
         import(/* webpackChunkName: "about" */ "./views/Register.vue")
     }
   ]
 });
+
+router.beforeEach((to, from, next) => {
+  setTimeout(() => {
+    if (!localStorage.getItem("access_token") && to.meta.requiresAuth) {
+      console.log(localStorage.getItem("access_token"));
+      console.log("rerouting from login");
+      next("/login");
+    } else next();
+  }, 500);
+});
+
+export default router;
