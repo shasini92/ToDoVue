@@ -27,11 +27,7 @@
           <span class="navbar-text" v-if="username">Welcome, {{username}}</span>
         </li>
         <li class="nav-item">
-          <a
-            class="nav-item nav-link button"
-            v-if="userLoggedIn"
-            @click="onLogout(accessToken)"
-          >Logout</a>
+          <a class="nav-item nav-link button" v-if="userLoggedIn" @click="onLogout">Logout</a>
         </li>
         <li class="nav-item">
           <router-link class="nav-link" to="/register" v-if="!userLoggedIn">Register</router-link>
@@ -47,14 +43,13 @@ import { mapActions, mapGetters } from "vuex";
 
 export default {
   name: "Header",
-  state: {},
   computed: {
-    ...mapGetters(["userLoggedIn", "accessToken", "username"])
+    ...mapGetters(["username", "userLoggedIn"])
   },
   methods: {
     ...mapActions(["logout"]),
-    onLogout(accessToken) {
-      this.logout(accessToken);
+    onLogout() {
+      this.logout();
       this.$router.push("/login");
     }
   }

@@ -1,24 +1,18 @@
 <template>
   <div id="app">
     <Header />
-    <!-- <AddTodo /> -->
     <router-view />
   </div>
 </template>
 
 <script>
 import Header from "./components/layout/Header";
-import Todos from "./views/Todos";
-import AddTodo from "./components/AddTodo";
 
 export default {
   name: "app",
-  components: { Header, Todos, AddTodo }
+  components: { Header }
 };
 </script>
-
-// TODO make sure to update the components, uncomment the components in the template, 
-
 
 <style>
 * {

@@ -1,35 +1,21 @@
 import axios from "axios";
 
 class TodoService {
-  async markComplete(updatedTodo, token) {
-    try {
-      const {
-        data: { data: todo }
-      } = await axios.put(
-        `http://127.0.0.1:8000/api/todos/${updatedTodo.id}`,
-        updatedTodo,
-        {
-          headers: { Authorization: `Bearer ${token}` }
-        }
-      );
-      return todo;
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
-  async deleteTodo(id, token) {
+  async deleteTodo(id) {
     try {
       await axios.delete(`http://127.0.0.1:8000/api/todos/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: {
+          Authorization: `Bearer ${JSON.parse(
+            localStorage.getItem("access_token")
+          )}`
+        }
       });
-      console.log("todo deleted");
     } catch (error) {
       console.log(error);
     }
   }
 
-  async updateTodo(updatedTodo, token) {
+  async updateTodo(updatedTodo) {
     try {
       const {
         data: { data: todo }
@@ -37,7 +23,11 @@ class TodoService {
         `http://127.0.0.1:8000/api/todos/${updatedTodo.id}`,
         updatedTodo,
         {
-          headers: { Authorization: `Bearer ${token}` }
+          headers: {
+            Authorization: `Bearer ${JSON.parse(
+              localStorage.getItem("access_token")
+            )}`
+          }
         }
       );
       return todo;
@@ -46,16 +36,17 @@ class TodoService {
     }
   }
 
-  async addTodo(newTodo, token) {
+  async addTodo(newTodo) {
     try {
       const {
         data: { data: todo }
       } = await axios.post(`http://127.0.0.1:8000/api/todos`, newTodo, {
         headers: {
-          Authorization: `Bearer ${token}}`
+          Authorization: `Bearer ${JSON.parse(
+            localStorage.getItem("access_token")
+          )}}`
         }
       });
-      console.log(todo);
 
       return todo;
     } catch (error) {
@@ -63,11 +54,13 @@ class TodoService {
     }
   }
 
-  async fetchTodos(token) {
+  async fetchTodos() {
     try {
       const { data } = await axios.get(`http://127.0.0.1:8000/api/todos`, {
         headers: {
-          Authorization: `Bearer ${token}}`
+          Authorization: `Bearer ${JSON.parse(
+            localStorage.getItem("access_token")
+          )}}`
         }
       });
 

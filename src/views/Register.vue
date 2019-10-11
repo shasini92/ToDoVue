@@ -9,16 +9,6 @@
                 <h4 class="mb-1">Register</h4>
                 <p class="mt-0">To access the best Todos app ever.</p>
                 <div class="form-group mt-3">
-                  <div
-                    class="alert alert-danger alert-dismissible fade show"
-                    role="alert"
-                    v-if="errorMessage"
-                  >
-                    <strong>{{errorMessage}}</strong>
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                      <span aria-hidden="true">&times;</span>
-                    </button>
-                  </div>
                   <div class="input-group input-group-alternative">
                     <input
                       class="form-control"
@@ -75,7 +65,6 @@
 </template>
 
 <script>
-import axios from "axios";
 import { mapActions } from "vuex";
 export default {
   name: "Register",
@@ -91,8 +80,7 @@ export default {
         email: "Make sure to enter a valid email address.",
         password: "Password must be between 8 and 20 characters."
       },
-      isDisabled: true,
-      errorMessage: ""
+      isDisabled: true
     };
   },
   methods: {
@@ -148,10 +136,9 @@ export default {
         this.isDisabled = true;
       }
     },
-    onRegister(e) {
-      this.register(this.userInfo);
+    async onRegister(e) {
+      await this.register(this.userInfo);
       this.$router.push("/");
-      // this.errorMessage = "User with the same email already exists.";
     }
   }
 };

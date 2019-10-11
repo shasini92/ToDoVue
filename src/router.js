@@ -12,10 +12,7 @@ const router = new Router({
     {
       path: "/",
       name: "home",
-      component: Todo,
-      meta: {
-        requiresAuth: true
-      }
+      component: Todo
     },
     {
       path: "/login",
@@ -33,16 +30,6 @@ const router = new Router({
         import(/* webpackChunkName: "about" */ "./views/Register.vue")
     }
   ]
-});
-
-router.beforeEach((to, from, next) => {
-  setTimeout(() => {
-    if (!localStorage.getItem("access_token") && to.meta.requiresAuth) {
-      console.log(localStorage.getItem("access_token"));
-      console.log("rerouting from login");
-      next("/login");
-    } else next();
-  }, 500);
 });
 
 export default router;

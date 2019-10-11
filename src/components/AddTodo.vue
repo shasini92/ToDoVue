@@ -2,7 +2,7 @@
   <div class="row">
     <div class="col-md-12 mt-3">
       <div class="card bg-gradient-secondary mt-3">
-        <form class="card-body" @submit.prevent="handleAddTodo(accessToken)">
+        <form class="card-body" @submit.prevent="handleAddTodo">
           <p class="mt-0">Create a new Todo.</p>
           <div class="form-group">
             <div class="input-group input-group-alternative">
@@ -50,7 +50,7 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from "vuex";
+import { mapActions } from "vuex";
 
 export default {
   name: "AddTodo",
@@ -64,26 +64,18 @@ export default {
       isDisabled: true
     };
   },
-  computed: {
-    ...mapGetters(["accessToken"])
-  },
   methods: {
     ...mapActions(["addTodo"]),
-    handleAddTodo(token) {
+    handleAddTodo() {
       let newTodo = {
         title: this.newTodo.title,
         description: this.newTodo.description,
         priority: this.newTodo.priority,
         completed: false
       };
-      let data = {
-        newTodo,
-        token
-      };
-      this.addTodo(data);
+      this.addTodo(newTodo);
       this.clearForm();
       this.showUpdate = false;
-      this.alert = { message: "Todo successfully created.", color: "success" };
     },
     validate() {
       if (this.newTodo.title) {

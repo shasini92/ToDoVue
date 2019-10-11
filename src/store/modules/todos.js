@@ -11,13 +11,14 @@ const state = {
 
 const getters = {
   allTodos: state => state.todos,
-  showUpdate: state => state.showUpdate
+  showUpdate: state => state.showUpdate,
+  alert: state => state.alert
 };
 
 const actions = {
-  async markComplete(data) {
+  async markComplete({ commit }, data) {
     try {
-      await todoService.updateTodo(data.updatedTodo, data.accessToken);
+      await todoService.updateTodo(data);
     } catch (error) {
       console.log(error);
     }
@@ -32,20 +33,16 @@ const actions = {
   },
   async updateTodo({ commit }, data) {
     try {
-      const updatedTodo = await todoService.updateTodo(
-        data.updatedTodo,
-        data.token
-      );
-      console.log(updatedTodo);
+      const updatedTodo = await todoService.updateTodo(data);
       commit("updateTodo", updatedTodo);
     } catch (error) {
       console.log(error);
     }
   },
 
-  async getAllTodos({ commit }, token) {
+  async getAllTodos({ commit }) {
     try {
-      const allTodos = await todoService.fetchTodos(token);
+      const allTodos = await todoService.fetchTodos();
       commit("setTodos", allTodos);
     } catch (error) {
       console.log(error);
@@ -53,7 +50,7 @@ const actions = {
   },
   async addTodo({ commit }, data) {
     try {
-      const newTodo = await todoService.addTodo(data.newTodo, data.token);
+      const newTodo = await todoService.addTodo(data);
 
       commit("newTodo", newTodo);
     } catch (error) {
@@ -63,9 +60,9 @@ const actions = {
 
   async deleteTodo({ commit }, data) {
     try {
-      await todoService.deleteTodo(data.id, data.accessToken);
+      await todoService.deleteTodo(data);
 
-      commit("removeTodo", data.id);
+      commit("removeTodo", data);
     } catch (error) {
       console.log(error);
     }
@@ -88,7 +85,10 @@ const mutations = {
   newTodo: (state, todo) => {
     getPriorityColor(todo);
     state.todos.unshift(todo);
-    // TODO reset form and set colors and alert message
+    state.alert = {
+      message: "Todo successfully created.",
+      class: "alert-success"
+    };
   },
 
   updateTodo: (state, updatedTodo) => {
@@ -101,6 +101,10 @@ const mutations = {
       }
     });
     state.showUpdate = false;
+    state.alert = {
+      message: "Todo successfully updated.",
+      class: "alert-primary"
+    };
   },
   removeTodo: (state, id) =>
     (state.todos = state.todos.filter(todo => todo.id !== id)),

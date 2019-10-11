@@ -2,7 +2,7 @@
   <div class="row">
     <div class="col-md-12 mt-3">
       <div class="card bg-gradient-secondary mt-3">
-        <form class="card-body" @submit.prevent="handleUpdate(accessToken)">
+        <form class="card-body" @submit.prevent="handleUpdate">
           <p class="mt-0">Update a todo</p>
           <div class="form-group">
             <div class="input-group input-group-alternative">
@@ -41,7 +41,7 @@
               :disabled="isDisabled"
               type="submit"
               class="btn btn-info btn-round btn-block btn-lg"
-              @click.prevent="handleUpdate(accessToken)"
+              @click.prevent="handleUpdate"
             >Update</button>
           </div>
 
@@ -50,7 +50,7 @@
             <button
               type="submit"
               class="btn btn-primary btn-round btn-block btn-lg"
-              @click.prevent="handleAddTodo(accessToken)"
+              @click.prevent="handleAddTodo"
               :disabled="isDisabled"
             >Create</button>
           </div>
@@ -61,7 +61,7 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from "vuex";
+import { mapActions } from "vuex";
 
 export default {
   name: "UpdateTodo",
@@ -75,25 +75,18 @@ export default {
     };
   },
   props: ["updatedTodo"],
-  computed: {
-    ...mapGetters(["accessToken"])
-  },
   methods: {
     ...mapActions(["addTodo", "updateTodo", "showUpdateForm"]),
-    handleAddTodo(token) {
+    handleAddTodo() {
       let newTodo = {
         title: this.updatedTodo.title,
         description: this.updatedTodo.description,
         priority: this.updatedTodo.priority,
         id: this.updatedTodo.id
       };
-      let data = {
-        newTodo,
-        token
-      };
-      this.addTodo(data);
+
+      this.addTodo(newTodo);
       this.showUpdateForm(false);
-      this.alert = { message: "Todo successfully created.", color: "success" };
     },
     handleUpdate(token) {
       let updatedTodo = {
@@ -103,13 +96,8 @@ export default {
         id: this.updatedTodo.id
       };
 
-      let data = {
-        updatedTodo,
-        token
-      };
-      this.updateTodo(data);
+      this.updateTodo(updatedTodo);
       this.showUpdate = false;
-      this.alert = { message: "Todo successfully updated.", color: "primary" };
     },
     validate() {
       if (this.updatedTodo.title) {

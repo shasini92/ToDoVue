@@ -10,16 +10,6 @@
                 <p class="mt-0">To access the best Todos app ever.</p>
 
                 <div class="form-group mt-3">
-                  <div
-                    class="alert alert-danger alert-dismissible fade show"
-                    role="alert"
-                    v-if="errorMessage"
-                  >
-                    <strong>{{errorMessage}}</strong>
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                      <span aria-hidden="true">&times;</span>
-                    </button>
-                  </div>
                   <div class="input-group input-group-alternative">
                     <input
                       class="form-control"
@@ -65,7 +55,7 @@
 <script>
 import VueRouter from "vue-router";
 import axios from "axios";
-import { mapActions, mapGetters } from "vuex";
+import { mapActions } from "vuex";
 
 export default {
   name: "Login",
@@ -75,13 +65,11 @@ export default {
         email: "",
         password: ""
       },
-      isDisabled: true,
-      errorMessage: ""
+      isDisabled: true
     };
   },
-  computed: mapGetters(["isUserLoggedIn"]),
   methods: {
-    ...mapActions(["login", "register"]),
+    ...mapActions(["login"]),
     validate() {
       if (this.userInfo.email && this.userInfo.password) {
         this.isDisabled = false;
@@ -89,14 +77,13 @@ export default {
         this.isDisabled = true;
       }
     },
-    onLogin() {
+    async onLogin() {
       let credentials = {
         email: this.userInfo.email,
         password: this.userInfo.password
       };
 
-      this.login(credentials);
-
+      await this.login(credentials);
       this.$router.push("/");
     }
   }
@@ -112,12 +99,6 @@ section.main-section {
 }
 .section {
   padding-top: 0;
-}
-.google-img-wrapper {
-  cursor: pointer;
-}
-.google-signin-img {
-  width: 175px;
 }
 </style>
 

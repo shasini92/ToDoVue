@@ -2,14 +2,12 @@ import { authService } from "../../services/AuthService";
 
 const state = {
   userLoggedIn: false,
-  userName: "",
-  accessToken: null
+  userName: ""
 };
 
 const getters = {
   userLoggedIn: store => store.userLoggedIn,
-  username: store => store.userName,
-  accessToken: store => store.accessToken
+  username: store => store.userName
 };
 
 const actions = {
@@ -21,9 +19,9 @@ const actions = {
       console.log(error);
     }
   },
-  async logout({ commit }, token) {
+  async logout({ commit }) {
     try {
-      await authService.logout(token);
+      await authService.logout();
       commit("logoutUser");
     } catch (error) {
       console.log(error);
@@ -39,37 +37,29 @@ const actions = {
   }
 };
 
-// const localStorageLogin = data => {
-//   localStorage.setItem("access_token", JSON.stringify(data.access_token));
-//   localStorage.setItem("userLoggedIn", JSON.stringify(true));
-//   localStorage.setItem("username", JSON.stringify(data.user.name));
-// };
+const localStorageLogin = data => {
+  localStorage.setItem("access_token", JSON.stringify(data.access_token));
+  localStorage.setItem("username", JSON.stringify(data.user.name));
+};
 
-// const localStorageLogout = () => {
-//   localStorage.removeItem("access_token");
-//   localStorage.removeItem("username");
-//   localStorage.setItem("userLoggedIn", JSON.stringify(false));
-// };
+const localStorageLogout = () => {
+  localStorage.removeItem("access_token");
+  localStorage.removeItem("username");
+};
 
 const mutations = {
   setUser: (state, data) => {
-    // localStorageLogin(data);
-    localStorage.setItem("access_token", JSON.stringify(data.access_token));
-    state.accessToken = data.access_token;
+    localStorageLogin(data);
     state.userLoggedIn = true;
     state.userName = data.user.name;
   },
   logoutUser: state => {
-    // localStorageLogout();
-    localStorage.removeItem("access_token");
+    localStorageLogout();
     state.userLoggedIn = false;
     state.userName = "";
-    state.accessToken = null;
   },
   register: (state, data) => {
-    // localStorageLogin(data);
-    localStorage.setItem("access_token", JSON.stringify(data.access_token));
-    state.accessToken = data.access_token;
+    localStorageLogin(data);
     state.userLoggedIn = true;
     state.userName = data.user.name;
   }
