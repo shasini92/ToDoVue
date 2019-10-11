@@ -5,20 +5,10 @@
         <div class="row row-grid align-items-center justify-content-md-center mt-5">
           <div class="col-lg-8 order-lg-1 mt-0">
             <div class="card bg-gradient-secondary shadow shadow-lg--hover mt-5">
-              <form class="card-body p-lg-5" @submit.prevent="register">
+              <form class="card-body p-lg-5" @submit.prevent="onRegister">
                 <h4 class="mb-1">Register</h4>
                 <p class="mt-0">To access the best Todos app ever.</p>
                 <div class="form-group mt-3">
-                  <div
-                    class="alert alert-danger alert-dismissible fade show"
-                    role="alert"
-                    v-if="errorMessage"
-                  >
-                    <strong>{{errorMessage}}</strong>
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                      <span aria-hidden="true">&times;</span>
-                    </button>
-                  </div>
                   <div class="input-group input-group-alternative">
                     <input
                       class="form-control"
@@ -75,7 +65,7 @@
 </template>
 
 <script>
-import axios from "axios";
+import { mapActions } from "vuex";
 export default {
   name: "Register",
   data() {
@@ -90,11 +80,11 @@ export default {
         email: "Make sure to enter a valid email address.",
         password: "Password must be between 8 and 20 characters."
       },
-      isDisabled: true,
-      errorMessage: ""
+      isDisabled: true
     };
   },
   methods: {
+    ...mapActions(["register"]),
     validateUsername(element) {
       if (!this.userInfo.name) {
         this.errors.username = "Name is required.";
@@ -146,23 +136,9 @@ export default {
         this.isDisabled = true;
       }
     },
-    register(e) {
-      axios({
-        method: "post",
-        url: "http://127.0.0.1:8000/api/register",
-        data: this.userInfo,
-        config: { headers: { "Content-Type": "application/json" } }
-      })
-        .then(({ data }) => {
-          this.$emit("register", data);
-          this.$router.push("/");
-        })
-        .catch(({ response: { status } }) => {
-          if (status === 500) {
-            console.log(1);
-            this.errorMessage = "User with the same email already exists.";
-          }
-        });
+    async onRegister(e) {
+      await this.register(this.userInfo);
+      this.$router.push("/");
     }
   }
 };

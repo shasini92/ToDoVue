@@ -5,21 +5,11 @@
         <div class="row row-grid align-items-center justify-content-md-center">
           <div class="col-lg-8 order-lg-1 mt-0">
             <div class="card bg-gradient-secondary shadow shadow-lg--hover mt-5">
-              <form class="card-body p-lg-5 pt-0" @submit.prevent="login">
+              <form class="card-body p-lg-5 pt-0" @submit.prevent="onLogin">
                 <h4 class="mb-1">Login</h4>
                 <p class="mt-0">To access the best Todos app ever.</p>
 
                 <div class="form-group mt-3">
-                  <div
-                    class="alert alert-danger alert-dismissible fade show"
-                    role="alert"
-                    v-if="errorMessage"
-                  >
-                    <strong>{{errorMessage}}</strong>
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                      <span aria-hidden="true">&times;</span>
-                    </button>
-                  </div>
                   <div class="input-group input-group-alternative">
                     <input
                       class="form-control"
@@ -65,6 +55,7 @@
 <script>
 import VueRouter from "vue-router";
 import axios from "axios";
+import { mapActions } from "vuex";
 
 export default {
   name: "Login",
@@ -74,11 +65,11 @@ export default {
         email: "",
         password: ""
       },
-      isDisabled: true,
-      errorMessage: ""
+      isDisabled: true
     };
   },
   methods: {
+    ...mapActions(["login"]),
     validate() {
       if (this.userInfo.email && this.userInfo.password) {
         this.isDisabled = false;
@@ -86,25 +77,14 @@ export default {
         this.isDisabled = true;
       }
     },
-    login() {
-      let data = {
+    async onLogin() {
+      let credentials = {
         email: this.userInfo.email,
         password: this.userInfo.password
       };
 
-      axios
-        .post("http://127.0.0.1:8000/api/login", data)
-        .then(({ data }) => {
-          this.$emit("login", data);
-          this.$router.push("/");
-        })
-        .catch(
-          ({
-            response: {
-              data: { error }
-            }
-          }) => (this.errorMessage = error)
-        );
+      await this.login(credentials);
+      this.$router.push("/");
     }
   }
 };
@@ -119,12 +99,6 @@ section.main-section {
 }
 .section {
   padding-top: 0;
-}
-.google-img-wrapper {
-  cursor: pointer;
-}
-.google-signin-img {
-  width: 175px;
 }
 </style>
 

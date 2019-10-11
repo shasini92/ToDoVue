@@ -6,7 +6,7 @@ import Todo from "./views/Todo";
 
 Vue.use(Router);
 
-export default new Router({
+const router = new Router({
   mode: "history",
   routes: [
     {
@@ -26,11 +26,10 @@ export default new Router({
     {
       path: "/register",
       name: "Register",
-      // route level code-splitting
-      // this generates a separate chunk (about.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
       component: () =>
         import(/* webpackChunkName: "about" */ "./views/Register.vue")
     }
   ]
 });
+
+export default router;
