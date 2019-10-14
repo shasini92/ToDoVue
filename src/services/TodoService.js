@@ -1,74 +1,51 @@
 import axios from "axios";
+import { setAuthHeader, configureHttp } from "./ServiceConfiguration";
 
-class TodoService {
+const todoService = {
+  init() {
+    configureHttp();
+    setAuthHeader();
+  },
   async deleteTodo(id) {
     try {
-      await axios.delete(`http://127.0.0.1:8000/api/todos/${id}`, {
-        headers: {
-          Authorization: `Bearer ${JSON.parse(
-            localStorage.getItem("access_token")
-          )}`
-        }
-      });
+      await axios.delete(`http://127.0.0.1:8000/api/todos/${id}`);
     } catch (error) {
       console.log(error);
     }
-  }
-
+  },
   async updateTodo(updatedTodo) {
     try {
       const {
         data: { data: todo }
       } = await axios.put(
         `http://127.0.0.1:8000/api/todos/${updatedTodo.id}`,
-        updatedTodo,
-        {
-          headers: {
-            Authorization: `Bearer ${JSON.parse(
-              localStorage.getItem("access_token")
-            )}`
-          }
-        }
+        updatedTodo
       );
       return todo;
     } catch (error) {
       console.log(error);
     }
-  }
-
+  },
   async addTodo(newTodo) {
     try {
       const {
         data: { data: todo }
-      } = await axios.post(`http://127.0.0.1:8000/api/todos`, newTodo, {
-        headers: {
-          Authorization: `Bearer ${JSON.parse(
-            localStorage.getItem("access_token")
-          )}}`
-        }
-      });
+      } = await axios.post(`http://127.0.0.1:8000/api/todos`, newTodo);
 
       return todo;
     } catch (error) {
       console.log(error);
     }
-  }
-
+  },
   async fetchTodos() {
     try {
-      const { data } = await axios.get(`http://127.0.0.1:8000/api/todos`, {
-        headers: {
-          Authorization: `Bearer ${JSON.parse(
-            localStorage.getItem("access_token")
-          )}}`
-        }
-      });
+      const { data } = await axios.get(`http://127.0.0.1:8000/api/todos`);
 
       return data;
     } catch (error) {
       console.log(error);
     }
   }
-}
+};
 
-export const todoService = new TodoService();
+export default todoService;

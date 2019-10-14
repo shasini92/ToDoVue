@@ -1,4 +1,4 @@
-import { todoService } from "../../services/TodoService";
+import todoService from "../../services/TodoService";
 
 const state = {
   todos: [],

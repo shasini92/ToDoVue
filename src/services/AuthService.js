@@ -1,6 +1,12 @@
 import axios from "axios";
+import { setAuthHeader, configureHttp } from "./ServiceConfiguration";
 
-class AuthService {
+const authService = {
+  init() {
+    configureHttp();
+    setAuthHeader();
+  },
+
   async login(credentials) {
     try {
       const { data } = await axios.post(
@@ -12,25 +18,15 @@ class AuthService {
     } catch (error) {
       console.log(error);
     }
-  }
+  },
 
   async logout() {
     try {
-      await axios.post(
-        `http://127.0.0.1:8000/api/logout`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${JSON.parse(
-              localStorage.getItem("access_token")
-            )}`
-          }
-        }
-      );
+      await axios.post(`http://127.0.0.1:8000/api/logout`, {});
     } catch (error) {
       console.log(error);
     }
-  }
+  },
 
   async register(newUserData) {
     try {
@@ -43,6 +39,6 @@ class AuthService {
       console.log(error);
     }
   }
-}
+};
 
-export const authService = new AuthService();
+export default authService;
