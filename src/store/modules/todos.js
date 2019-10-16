@@ -1,10 +1,9 @@
-import todoService from "../../services/TodoService";
+import { todoService } from "../../services/TodoService";
 
 const state = {
   todos: [],
   alert: {
-    message: "",
-    color: ""
+    message: ""
   },
   showUpdate: false
 };
@@ -26,15 +25,16 @@ const actions = {
 
   async showUpdateForm({ commit }, data) {
     try {
-      commit("showUpdateForm", data);
+      commit("SHOW_UPDATE_FORM", data);
     } catch (error) {
       console.log(error);
     }
   },
+
   async updateTodo({ commit }, data) {
     try {
       const updatedTodo = await todoService.updateTodo(data);
-      commit("updateTodo", updatedTodo);
+      commit("UPDATE_TODO", updatedTodo);
     } catch (error) {
       console.log(error);
     }
@@ -43,16 +43,17 @@ const actions = {
   async getAllTodos({ commit }) {
     try {
       const allTodos = await todoService.fetchTodos();
-      commit("setTodos", allTodos);
+      commit("SET_TODOS", allTodos);
     } catch (error) {
       console.log(error);
     }
   },
+
   async addTodo({ commit }, data) {
     try {
       const newTodo = await todoService.addTodo(data);
 
-      commit("newTodo", newTodo);
+      commit("ADD_TODO", newTodo);
     } catch (error) {
       console.log(error);
     }
@@ -62,7 +63,7 @@ const actions = {
     try {
       await todoService.deleteTodo(data);
 
-      commit("removeTodo", data);
+      commit("REMOVE_TODO", data);
     } catch (error) {
       console.log(error);
     }
@@ -76,13 +77,14 @@ const getPriorityColor = item => {
 };
 
 const mutations = {
-  setTodos: (state, todos) => {
+  SET_TODOS: (state, todos) => {
     state.todos = todos.map(todo => {
       getPriorityColor(todo);
       return todo;
     });
   },
-  newTodo: (state, todo) => {
+
+  ADD_TODO: (state, todo) => {
     getPriorityColor(todo);
     state.todos.unshift(todo);
     state.alert = {
@@ -91,7 +93,7 @@ const mutations = {
     };
   },
 
-  updateTodo: (state, updatedTodo) => {
+  UPDATE_TODO: (state, updatedTodo) => {
     state.todos.filter(todo => {
       if (todo.id === updatedTodo.id) {
         todo.title = updatedTodo.title;
@@ -106,10 +108,15 @@ const mutations = {
       class: "alert-primary"
     };
   },
-  removeTodo: (state, id) =>
+
+  REMOVE_TODO: (state, id) =>
     (state.todos = state.todos.filter(todo => todo.id !== id)),
 
-  showUpdateForm: (state, data) => (state.showUpdate = data)
+  SHOW_UPDATE_FORM: (state, data) => (state.showUpdate = data),
+
+  DELETE_ALERT_MESSAGE: state => {
+    state.alert.message = "";
+  }
 };
 
 export default {

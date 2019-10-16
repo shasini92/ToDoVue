@@ -1,4 +1,4 @@
-import authService from "../../services/AuthService";
+import { authService } from "../../services/AuthService";
 
 const state = {
   userLoggedIn: false,
@@ -14,23 +14,25 @@ const actions = {
   async login({ commit }, credentials) {
     try {
       const data = await authService.login(credentials);
-      commit("setUser", data);
+      commit("SET_USER", data);
     } catch (error) {
       console.log(error);
     }
   },
+
   async logout({ commit }) {
     try {
       await authService.logout();
-      commit("logoutUser");
+      commit("LOGOUT_USER");
     } catch (error) {
       console.log(error);
     }
   },
+
   async register({ commit }, newUser) {
     try {
       const createdUser = await authService.register(newUser);
-      commit("register", createdUser);
+      commit("REGISTER_USER", createdUser);
     } catch (error) {
       console.log(error);
     }
@@ -48,20 +50,26 @@ const localStorageLogout = () => {
 };
 
 const mutations = {
-  setUser: (state, data) => {
+  SET_USER: (state, data) => {
     localStorageLogin(data);
     state.userLoggedIn = true;
     state.userName = data.user.name;
   },
-  logoutUser: state => {
+
+  LOGOUT_USER: state => {
     localStorageLogout();
     state.userLoggedIn = false;
     state.userName = "";
   },
-  register: (state, data) => {
+
+  REGISTER_USER: (state, data) => {
     localStorageLogin(data);
     state.userLoggedIn = true;
     state.userName = data.user.name;
+  },
+
+  SET_USER_LOGGED_IN: (state, data) => {
+    state.userLoggedIn = data;
   }
 };
 

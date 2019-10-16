@@ -11,7 +11,6 @@
                 placeholder="Todo title.."
                 name="title"
                 type="text"
-                @keyup="validate"
                 v-model="newTodo.title"
               />
             </div>
@@ -54,18 +53,30 @@ import { mapActions } from "vuex";
 
 export default {
   name: "AddTodo",
+
   data: function() {
     return {
       newTodo: {
         title: "",
         description: "",
         priority: "High"
-      },
-      isDisabled: true
+      }
     };
   },
+
+  computed: {
+    isDisabled() {
+      if (this.newTodo.title) {
+        return false;
+      } else {
+        return true;
+      }
+    }
+  },
+
   methods: {
     ...mapActions(["addTodo"]),
+
     handleAddTodo() {
       let newTodo = {
         title: this.newTodo.title,
@@ -77,13 +88,7 @@ export default {
       this.clearForm();
       this.showUpdate = false;
     },
-    validate() {
-      if (this.newTodo.title) {
-        this.isDisabled = false;
-      } else {
-        this.isDisabled = true;
-      }
-    },
+
     clearForm() {
       (this.newTodo.title = ""), (this.newTodo.description = "");
       this.newTodo.priority = "High";

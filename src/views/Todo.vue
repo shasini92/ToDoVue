@@ -67,7 +67,6 @@
   </div>
 </template>
 
-
 <script>
 import Vue from "vue";
 import { mapGetters, mapActions } from "vuex";
@@ -76,6 +75,7 @@ import UpdateTodo from "../components/UpdateTodo";
 
 export default {
   name: "Todo",
+
   data: function() {
     return {
       newTodo: {
@@ -87,13 +87,22 @@ export default {
         title: "",
         description: "",
         priority: ""
-      },
-      isDisabled: true
+      }
     };
   },
+
   computed: {
-    ...mapGetters(["allTodos", "showUpdate", "alert"])
+    ...mapGetters(["allTodos", "showUpdate", "alert"]),
+
+    isDisabled() {
+      if (this.newTodo.title) {
+        return false;
+      } else {
+        return true;
+      }
+    }
   },
+
   methods: {
     ...mapActions([
       "getAllTodos",
@@ -111,18 +120,13 @@ export default {
       this.updatedTodo.id = todoItem.id;
       this.showUpdateForm(true);
     },
-    validate() {
-      if (this.newTodo.title || this.updatedTodo.title) {
-        this.isDisabled = false;
-      } else {
-        this.isDisabled = true;
-      }
-    },
+
     handleDelete(id) {
       this.deleteTodo(id);
       this.alert.message = "Todo successfully deleted.";
       this.alert.class = "alert-danger";
     },
+
     handleComplete(id) {
       let updatedTodo = this.allTodos.filter(element => {
         if (element.id === id) {
@@ -132,16 +136,17 @@ export default {
       })[0];
 
       updatedTodo.id = id;
-
       this.markComplete(updatedTodo);
     }
   },
+
   created() {
     if (!localStorage.getItem("access_token")) this.$router.push("/login");
     else {
       this.getAllTodos();
     }
   },
+
   components: {
     AddTodo,
     UpdateTodo

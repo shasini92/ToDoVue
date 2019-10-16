@@ -11,7 +11,6 @@
                 placeholder="Update title.."
                 name="title"
                 type="text"
-                @keyup="validate"
                 v-model="updatedTodo.title"
               />
             </div>
@@ -44,7 +43,6 @@
               @click.prevent="handleUpdate"
             >Update</button>
           </div>
-
           <br />
           <div>
             <button
@@ -65,18 +63,31 @@ import { mapActions } from "vuex";
 
 export default {
   name: "UpdateTodo",
+
   data: function() {
     return {
-      isDisabled: false,
       alert: {
         message: "",
         color: ""
       }
     };
   },
+
   props: ["updatedTodo"],
+
+  computed: {
+    isDisabled() {
+      if (this.updatedTodo.title) {
+        return false;
+      } else {
+        return true;
+      }
+    }
+  },
+
   methods: {
     ...mapActions(["addTodo", "updateTodo", "showUpdateForm"]),
+
     handleAddTodo() {
       let newTodo = {
         title: this.updatedTodo.title,
@@ -88,6 +99,7 @@ export default {
       this.addTodo(newTodo);
       this.showUpdateForm(false);
     },
+
     handleUpdate(token) {
       let updatedTodo = {
         title: this.updatedTodo.title,
@@ -98,13 +110,6 @@ export default {
 
       this.updateTodo(updatedTodo);
       this.showUpdate = false;
-    },
-    validate() {
-      if (this.updatedTodo.title) {
-        this.isDisabled = false;
-      } else {
-        this.isDisabled = true;
-      }
     }
   }
 };

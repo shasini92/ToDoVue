@@ -3,6 +3,7 @@ import Router from "vue-router";
 import Login from "./views/Login";
 import PageNotFound from "./views/PageNotFound";
 import Todo from "./views/Todo";
+import Register from "./views/Register";
 
 Vue.use(Router);
 
@@ -25,9 +26,8 @@ const router = new Router({
     },
     {
       path: "/register",
-      name: "Register",
-      component: () =>
-        import(/* webpackChunkName: "about" */ "./views/Register.vue")
+      name: "register",
+      component: Register
     }
   ]
 });

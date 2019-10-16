@@ -13,8 +13,6 @@
                     <input
                       class="form-control"
                       placeholder="Your Name"
-                      @keyup="validate($event)"
-                      @keydown="validate($event)"
                       type="text"
                       v-model="userInfo.name"
                     />
@@ -28,7 +26,6 @@
                       placeholder="Your Email address"
                       type="email"
                       v-model="userInfo.email"
-                      @keyup="validate($event)"
                     />
                   </div>
                   <small v-if="errors.email" class="text-danger">{{errors.email}}</small>
@@ -40,7 +37,6 @@
                       placeholder="Your Password"
                       type="password"
                       v-model="userInfo.password"
-                      @keyup="validate($event)"
                     />
                   </div>
                   <small v-if="errors.password" class="text-danger">{{errors.password}}</small>
@@ -52,7 +48,7 @@
                     class="btn btn-primary btn-round btn-block btn-lg"
                   >Sign up</button>
                 </div>
-                <router-link to="/login" class="register-link">
+                <router-link :to="{name:'login'}" class="register-link">
                   <span class="nav-link-inner--text">Already Registered?</span>
                 </router-link>
               </form>
@@ -66,8 +62,11 @@
 
 <script>
 import { mapActions } from "vuex";
+import { authService } from "../services/AuthService";
+
 export default {
   name: "Register",
+
   data() {
     return {
       userInfo: {
@@ -76,69 +75,71 @@ export default {
         password: ""
       },
       errors: {
-        username: "Make sure the username is not empty.",
-        email: "Make sure to enter a valid email address.",
-        password: "Password must be between 8 and 20 characters."
-      },
-      isDisabled: true
+        username: "",
+        email: "",
+        password: "Password must be at least 6 characters long."
+      }
     };
   },
-  methods: {
-    ...mapActions(["register"]),
-    validateUsername(element) {
-      if (!this.userInfo.name) {
-        this.errors.username = "Name is required.";
-        element.srcElement.classList.add("is-invalid");
+
+  computed: {
+    isDisabled() {
+      let { email, username, password } = this.errors;
+      if (email == "" && username == "" && password == "") {
+        return false;
       } else {
-        this.errors.username = "";
-        element.srcElement.classList.remove("is-invalid");
-        element.srcElement.classList.add("is-valid");
+        return true;
       }
     },
-    validateEmail(element) {
+
+    name() {
+      return this.userInfo.name;
+    },
+
+    email() {
+      return this.userInfo.email;
+    },
+
+    password() {
+      return this.userInfo.password;
+    }
+  },
+
+  watch: {
+    name() {
+      if (!this.userInfo.name) {
+        this.errors.username = "Name is required.";
+      } else {
+        this.errors.username = "";
+      }
+    },
+
+    email() {
       let reg = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,24}))$/;
       let { email } = this.userInfo;
       if (!email || !reg.test(email)) {
         this.errors.email = "Please enter a valid email.";
-        element.srcElement.classList.add("is-invalid");
       } else {
         this.errors.email = "";
-        element.srcElement.classList.remove("is-invalid");
-        element.srcElement.classList.add("is-valid");
       }
     },
-    validatePassword(element) {
+
+    password() {
       let { password } = this.userInfo;
-      if ((password = "" || password.length < 8 || password.length > 20)) {
-        this.errors.password = "Password must be between 8 and 20 characters.";
-        element.srcElement.classList.add("is-invalid");
+      if ((password = "" || password.length < 6)) {
+        this.errors.password = "Password must be at least 6 characters long.";
       } else {
         this.errors.password = "";
-        element.srcElement.classList.remove("is-invalid");
-        element.srcElement.classList.add("is-valid");
       }
-    },
-    validate(element) {
-      let { type } = element.srcElement;
+    }
+  },
 
-      if (type == "text") {
-        this.validateUsername(element);
-      } else if (type == "password") {
-        this.validatePassword(element);
-      } else {
-        this.validateEmail(element);
-      }
+  methods: {
+    ...mapActions(["register"]),
 
-      let { email, username, password } = this.errors;
-      if (email == "" && username == "" && password == "") {
-        this.isDisabled = false;
-      } else {
-        this.isDisabled = true;
-      }
-    },
-    async onRegister(e) {
+    async onRegister() {
       await this.register(this.userInfo);
-      this.$router.push("/");
+      this.$router.push({ name: "home" });
     }
   }
 };

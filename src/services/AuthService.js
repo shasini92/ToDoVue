@@ -1,44 +1,42 @@
-import axios from "axios";
-import { setAuthHeader, configureHttp } from "./ServiceConfiguration";
+import { apiService } from "./ApiBaseService";
 
-const authService = {
-  init() {
-    configureHttp();
-    setAuthHeader();
-  },
+const ENDPOINTS = {
+  LOGIN: "/login",
+  LOGOUT: "/logout",
+  REGISTER: "/register"
+};
 
+class AuthService {
   async login(credentials) {
     try {
-      const { data } = await axios.post(
-        `http://127.0.0.1:8000/api/login`,
-        credentials
-      );
+      const { data } = await apiService
+        .getApiClient()
+        .post(ENDPOINTS.LOGIN, credentials);
 
-      return data;
-    } catch (error) {
-      console.log(error);
-    }
-  },
-
-  async logout() {
-    try {
-      await axios.post(`http://127.0.0.1:8000/api/logout`, {});
-    } catch (error) {
-      console.log(error);
-    }
-  },
-
-  async register(newUserData) {
-    try {
-      const { data } = await axios.post(
-        `http://127.0.0.1:8000/api/register`,
-        newUserData
-      );
       return data;
     } catch (error) {
       console.log(error);
     }
   }
-};
 
-export default authService;
+  async logout() {
+    try {
+      await apiService.getApiClient().post(ENDPOINTS.LOGOUT, {});
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async register(newUserData) {
+    try {
+      const { data } = await apiService
+        .getApiClient()
+        .post(ENDPOINTS.REGISTER, newUserData);
+      return data;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+}
+
+export const authService = new AuthService();
